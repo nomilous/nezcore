@@ -11,12 +11,13 @@ injector =
     # 
     # <pre>
     #
-    #    inject [1,2,3], (one, two, three, should) -> 
+    #    inject [1,2,3], (one, two, three, should, async:waterfall) -> 
     #
     #        should.should.equal require 'should'
     #        one.should.equal   1
     #        two.should.equal   2
     #        three.should.equal 3
+    #        waterfall.should.equal require('async').waterfall
     #
     # </pre>
     # 
