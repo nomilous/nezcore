@@ -336,4 +336,45 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
             services[2].Mod4.should.equal 'Mod4'
 
             test done
+
+
+        it 'arranges _arg to support multiple component injection from the same module', (done) ->
+
+            services = [
+                {module: 'mod0'}
+                {module: 'mod1'}
+                {                                            # from injection as:
+                    _nested: {                               # 
+                        class1: ['ServiceModule', 'class1']  # ( ServiceModule:class1,
+                        class2: ['ServiceModule', 'class2']  #   ServiceModule:class2,
+                        ServiceModule: ['ServiceModule']     #   ServiceModule ) -> 
+                    }
+                }
+            ]
+
+            preDefined = ['mod0', 'mod1']
+
+            #
+            # mock findModule
+            #
+
+            ServiceModule =
+                class1: 'ServiceModule.class1'
+                class2: 'ServiceModule.class2'
+
+            InjectorSupport.findModule = -> ServiceModule
+
+            services = InjectorSupport.loadServices( services, preDefined )
+            _arg     = services[2]  # mod0 and mod1 were injected at [0..1]
+
+            #
+            # _arg.ServiceModule 
+            #
+
+            _arg.ServiceModule.should.equal 'ServiceModule.class1'
+            _arg.ServiceModule.should.equal 'ServiceModule.class2'
+            _arg.ServiceModule.should.equal 'ServiceModule'
+
+            test done
+
            
