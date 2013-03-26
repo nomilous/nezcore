@@ -7,7 +7,7 @@ fs         = require 'fs'
 #       very strange...
 #
 
-require 'fing' if typeof fing == 'undefined'
+require 'fing' #  if typeof fing == 'undefined'
 
 module.exports = support = 
 
@@ -61,14 +61,15 @@ module.exports = support =
     uniformDepth: (modules, funcStr) -> 
 
         nestings = {}
+        nargs    = funcStr.match /_(arg|ref)\.(\w*)/g
 
-        for narg in funcStr.match /_(arg|ref)\.(\w*)/g
+        for narg in nargs
             
             chain     = narg.split('.')
             ref       = chain.shift()
             regexp    = new RegExp "(\\w*) = _arg.#{chain[0]}"
             targetArg = funcStr.match( regexp )[1]
-
+            funcStr   = funcStr.replace regexp, ''
 
             #
             # "and final as flat"
@@ -91,7 +92,6 @@ module.exports = support =
 
             continue if skip-- > 0
 
-
             if config._nested
 
                 support.loadNested services, config._nested
@@ -109,6 +109,8 @@ module.exports = support =
         #
         # multiple modules to be injected through _arg
         #
+
+        # console.log 'populating _arg with config:', config
 
         modules  = {}
         sequence = []
@@ -162,6 +164,7 @@ module.exports = support =
 
                     enumerable: true
 
+            # console.log 'inserting _arg.%s as target:', moduleName, config[target]
 
             #
             # populate the stack for the getter to pop from 
@@ -206,15 +209,30 @@ module.exports = support =
 
 
         #
-        # load a locally defined in (lib|app|bin)
+        # load a locally defined module in (lib|app|bin)
         #
 
+
         name     = Inflection.underscore config.module
-        stack    = fing.trace()
         previous = null
 
-        for call in stack
+        for line in Error.apply(this).stack.split('\n')
 
+            continue if line == 'Error'
+            continue if line.match /unknown source/
+
+            try
+                
+                parts = line.match(/\((.*)\:\d*\:\d*/)
+                parts = line.match(/\W*at (.*)\:\d*\:\d*/) unless parts
+                file  = parts[1]
+
+            catch error
+
+                throw 'error parsing stack trace ' + error
+                continue
+
+            
             #
             # is the call coming from a spec run?
             #
@@ -226,21 +244,19 @@ module.exports = support =
             # path and it will be a subdirectory of the repo root.
             # 
 
-            if call.file.match /injector_support.js$/
-
-                #
-                # ignore self in stack
-                #
-
-                continue
-
-            if match = call.file.match /(.*)\/spec\/.*/
+            if match = file.match /(.*)\/spec\/.*/
 
                 path = match[1]
                 modulePath = support.getModulePath name, path, ['lib','app','bin']
+
+                #console.log 'found spec', 
+
                 return require modulePath if modulePath
                 throw new Error "Injector failed to locate #{name}.js in #{path}"
 
+            if file.match /injector_support.js$/
+
+                continue
 
             #
             # if not from a spec run then
@@ -257,7 +273,7 @@ module.exports = support =
             # 
             #
 
-            else if call.file == 'module.js'
+            else if file == 'module.js'
 
                 if match = previous.match /(.*)\/(lib|app|bin)\//
 
@@ -268,7 +284,7 @@ module.exports = support =
 
                 continue
 
-            previous = call.file
+            previous = file
 
         throw new Error "Injector failed to locate #{name}.js"
 

@@ -283,7 +283,7 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
 
                 [ 
                     {module: 'LocalModule1'}
-                    {module: 'should'}
+                    {module: 'Should'}
                     {module: 'LocalModule2'}
 
                 ], []
@@ -291,7 +291,7 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
             ).should.eql [
 
                 'FakeLocalModule1'
-                require 'should'
+                'FakeShould'
                 'FakeLocalModule2'
 
             ]
