@@ -97,23 +97,7 @@ module.exports = support =
                 support.loadNested services, config._nested
                 continue
 
-            if config.module.match /^[A-Z]/
-
-                #
-                # Inject local module (from ./lib or ./app)
-                #
-
-                services.push support.findModule config
-
-            else
-
-                #
-                # Inject installed npm module
-                #
-
-                module = require config.module
-                services.push module
-
+            services.push support.findModule config
 
         #console.log "services:", services
 
@@ -122,9 +106,108 @@ module.exports = support =
 
     loadNested: (services, config) -> 
 
-        
+        #
+        # multiple modules to be injected through _arg
+        #
+
+        modules  = {}
+        sequence = []
+        _arg     = {}
+
+        for target of config
+
+            chain      = config[target]
+            moduleName = chain[0]       # could be a class
+            className  = chain[1]       # could be a function
+
+            #
+            # keep ref to the sequence of the modules being injected
+            #
+            sequence.push moduleName
+
+            if typeof modules[moduleName] == 'undefined'
+
+                #
+                # load the module and define the getter (_arg.moduleName)
+                #
+
+                modules[moduleName] = 
+
+                    module: support.findModule( module: moduleName )
+
+                    #
+                    # the same module could be injected multiple times
+                    # as (module:class1, module:class2)
+                    #
+                    # each requires reference to control what is returned
+                    # from _arg.moduleName 
+                    # 
+
+                    stack: []
+
+                # console.log 'creating _arg.%s for target:', moduleName, config[target]
+
+                Object.defineProperty _arg, moduleName, 
+
+                    get: -> 
+
+                        # 
+                        # modules[moduleName].stack.pop() only ever pops 
+                        # from modules.['the last moduleName injected']
+                        # 
+                        # so this uses the sequence as assembled
+                        # 
+
+                        modules[sequence.shift()].stack.pop()
+
+                    enumerable: true
+
+
+            #
+            # populate the stack for the getter to pop from 
+            # for the given _arg.moduleName
+            #
+
+            if typeof className == 'undefined'
+
+                #
+                # entire module is being injected
+                # 
+
+                modules[moduleName].stack.unshift modules[moduleName].module
+
+            else
+
+                #
+                # focussed module:classname is being injected
+                # 
+
+                modules[moduleName].stack.unshift modules[moduleName].module[className]
+
+
+
+        #
+        # append _arg to the injectables
+        #
+
+        services.push _arg
+        return services
+
 
     findModule: (config) ->
+
+        unless config.module.match /^[A-Z]/
+
+            #
+            # not CamelCase, getting node_module 
+            #            
+
+            return require config.module
+
+
+        #
+        # load a locally defined in (lib|app|bin)
+        #
 
         name     = Inflection.underscore config.module
         stack    = fing.trace()

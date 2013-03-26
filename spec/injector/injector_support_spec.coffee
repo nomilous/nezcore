@@ -330,10 +330,12 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
             services = InjectorSupport.loadServices( services, preDefined )
 
             services[0].should.equal 'mod0' 
-            services[1].should.equal 'mod1' 
-            services[2].Mod2.should.equal 'class2'
-            services[2].Mod3.should.equal 'class3'
-            services[2].Mod4.should.equal 'Mod4'
+            services[1].should.equal 'mod1'
+
+            _arg = services[2]
+            _arg.Mod2.should.equal 'class2'
+            _arg.Mod3.should.equal 'class3'
+            _arg.Mod4.should.equal 'Mod4'
 
             test done
 
@@ -343,11 +345,11 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
             services = [
                 {module: 'mod0'}
                 {module: 'mod1'}
-                {                                            # from injection as:
-                    _nested: {                               # 
-                        class1: ['ServiceModule', 'class1']  # ( ServiceModule:class1,
-                        class2: ['ServiceModule', 'class2']  #   ServiceModule:class2,
-                        ServiceModule: ['ServiceModule']     #   ServiceModule ) -> 
+                {                                                      # from injection as:
+                    _nested: {                                         # 
+                        class1:        ['ServiceModule', 'class1']     # ( ServiceModule:class1,
+                        function1:     ['ServiceModule', 'function1']  #   ServiceModule:function1,
+                        ServiceModule: ['ServiceModule']               #   ServiceModule ) -> 
                     }
                 }
             ]
@@ -359,8 +361,8 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
             #
 
             ServiceModule =
-                class1: 'ServiceModule.class1'
-                class2: 'ServiceModule.class2'
+                class1:       'Injected a class'
+                function1: -> 'Injected a function'
 
             InjectorSupport.findModule = -> ServiceModule
 
@@ -368,12 +370,13 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
             _arg     = services[2]  # mod0 and mod1 were injected at [0..1]
 
             #
-            # _arg.ServiceModule 
+            # _arg.ServiceModule which pops() the services that were loaded 
+            # in InjectorSupport.loadNested()
             #
 
-            _arg.ServiceModule.should.equal 'ServiceModule.class1'
-            _arg.ServiceModule.should.equal 'ServiceModule.class2'
-            _arg.ServiceModule.should.equal 'ServiceModule'
+            _arg.ServiceModule.should.equal 'Injected a class'
+            _arg.ServiceModule().should.equal 'Injected a function'
+            _arg.ServiceModule.should.equal ServiceModule
 
             test done
 
