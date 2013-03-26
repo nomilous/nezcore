@@ -329,14 +329,11 @@ require('nez').realize 'InjectorSupport', (InjectorSupport, test, context, shoul
 
             services = InjectorSupport.loadServices( services, preDefined )
 
-            services.should.eql [
-                'mod0'
-                'mod1'
-                { 
-                    Mod2: 'class2'
-                    Mod3: 'class3'
-                    Mod4: 'Mod4' 
-                }
-            ]
+            services[0].should.equal 'mod0' 
+            services[1].should.equal 'mod1' 
+            services[2].Mod2.should.equal 'class2'
+            services[2].Mod3.should.equal 'class3'
+            services[2].Mod4.should.equal 'Mod4'
 
-
+            test done
+           

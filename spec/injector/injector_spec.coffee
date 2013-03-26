@@ -19,6 +19,15 @@ require('nez').realize 'Injector', (Injector, test, context, should, InjectorSup
                 wrench.should.equal require 'wrench'
                 test done
 
+        it 'can to that twice with other things', (done) -> 
+
+            Injector.inject [1], (one, inflection:underscore, wrench:readdirSyncRecursive, wrench) -> 
+
+                underscore.should.equal require('inflection').underscore
+                readdirSyncRecursive.should.equal require('wrench').readdirSyncRecursive
+                wrench.should.equal require 'wrench'
+                test done
+
 
         it 'can inject positionally as specified', (done) -> 
 

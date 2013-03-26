@@ -63,10 +63,12 @@ module.exports = support =
         nestings = {}
 
         for narg in funcStr.match /_(arg|ref)\.(\w*)/g
-
+            
             chain     = narg.split('.')
             ref       = chain.shift()
-            targetArg = funcStr.match( new RegExp "(\\w*) = _arg.#{chain[0]}" )[1]
+            regexp    = new RegExp "(\\w*) = _arg.#{chain[0]}"
+            targetArg = funcStr.match( regexp )[1]
+
 
             #
             # "and final as flat"
