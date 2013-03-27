@@ -1,6 +1,6 @@
 require('nez').realize 'Core', (Core, test, it) -> 
     
-    for toolset in ['injector']
+    for toolset in ['config', 'injector']
 
         it "exports #{toolset}", (done) ->
 
