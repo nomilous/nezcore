@@ -8,9 +8,8 @@ require('nez').realize 'Config', (Config, test, context) ->
 
             fs.readFileSync = (filename) ->
 
-                filename.should.equal 'FILENAME'
                 fs.readFileSync = original
+                filename.should.equal 'FILENAME'
                 test done
-
 
             Config.load file: 'FILENAME'
