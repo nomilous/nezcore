@@ -1,5 +1,4 @@
 fs     = require 'fs'
-config = null
 
 # 
 # private config class 
@@ -7,16 +6,41 @@ config = null
 
 class Config
 
-    @fromFile: (opts) -> 
+    constructor: (opts) -> 
+
+        #
+        # defaults
+        #
+
+        @objective =
+            module: process.env.NEZ_PLUGIN_OBJECTIVE || 'eo'
+
+        for key of opts
+
+            @[key] = opts[key]
+
+    fromFile: (fileName) -> 
 
         try
 
-            content = fs.readFileSync opts.file
+            content = fs.readFileSync fileName
 
         catch error
 
-            console.log 'error loading config from file:', opts.file
+            console.log 'error loading config from file:', fileName
             process.exit 100
+
+
+#
+# defaults
+#
+
+if typeof runningConfig == 'undefined'
+
+    runningConfig = new Config
+
+        
+
 
 #
 # public config interface
@@ -28,5 +52,20 @@ module.exports =
 
         if opts.file
 
-            config = Config.fromFile opts
-            return 
+            runningConfig.fromFile opts.file
+            return
+
+    get: (key) -> runningConfig[key]
+
+    hup: -> 
+
+        #
+        # TODO: changed?
+        #
+
+        # pendingConfig = new Config
+        runningConfig = new Config
+
+
+
+
