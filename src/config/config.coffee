@@ -13,7 +13,8 @@ class Config
         #
 
         @objective =
-            module: process.env.NEZ_PLUGIN_OBJECTIVE || 'eo'
+            module: process.env.NEZ_OBJECTIVE_MODULE || 'eo'
+            class:  process.env.NEZ_OBJECTIVE_CLASS  || 'dev'
 
         for key of opts
 
