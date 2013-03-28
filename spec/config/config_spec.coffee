@@ -6,8 +6,8 @@ require('nez').realize 'Config', (Config, test, context) ->
 
             Config.get('objective').should.eql 
 
-                module: 'eo'
-                class: 'dev'
+                _module: 'eo'
+                _class: 'dev'
 
             test done
 
@@ -19,8 +19,8 @@ require('nez').realize 'Config', (Config, test, context) ->
 
             Config.get('objective').should.eql 
 
-                module: 'NEZ_OBJECTIVE_MODULE'
-                class: 'NEZ_OBJECTIVE_CLASS'
+                _module: 'NEZ_OBJECTIVE_MODULE'
+                _class: 'NEZ_OBJECTIVE_CLASS'
 
             test done
 
