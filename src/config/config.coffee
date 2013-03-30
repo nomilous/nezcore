@@ -14,7 +14,7 @@ class Config
 
         @objective =
             _module: process.env.NEZ_OBJECTIVE_MODULE || 'eo'
-            _class:  process.env.NEZ_OBJECTIVE_CLASS  || 'dev'
+            _class:  process.env.NEZ_OBJECTIVE_CLASS  || 'Develop'
 
         for key of opts
 
