@@ -2,7 +2,7 @@ require('nez').realize 'Config', (Config, test, context) ->
 
     context 'defaults', (it) -> 
 
-        it 'defaults objective module to eo:Develop', (done) -> 
+        it 'defaults objective implementation to eo:Develop', (done) -> 
 
             Config.get('objective').should.eql 
 
@@ -10,14 +10,23 @@ require('nez').realize 'Config', (Config, test, context) ->
 
             test done
 
-        it 'allows objective override from env', (done) ->
+        it 'defaults realization implementation to ipso:SpecRun', (done) -> 
 
-            process.env.NEZ_OBJECTIVE = 'module:Class'
+            Config.get('realizer').should.eql 
+
+                _class: 'ipso:SpecRun'
+
+            test done
+
+        it 'allows override from env', (done) ->
+
+            process.env.NEZ_OBJECTIVE = 'Monitor:HostOk'
+            process.env.NEZ_REALZER   = 'Ubuntu:V_12_04_LTS'
+
             Config.hup()
 
-            Config.get('objective').should.eql 
-
-                _class: 'module:Class'
+            Config.get( 'objective' ).should.eql _class: 'Monitor:HostOk'
+            Config.get( 'realizer'  ).should.eql _class: 'Ubuntu:V_12_04_LTS'
 
             test done
 
