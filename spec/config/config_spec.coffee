@@ -2,25 +2,22 @@ require('nez').realize 'Config', (Config, test, context) ->
 
     context 'defaults', (it) -> 
 
-        it 'defaults objective module to eo:dev', (done) -> 
+        it 'defaults objective module to eo:Develop', (done) -> 
 
             Config.get('objective').should.eql 
 
-                _module: 'eo'
-                _class: 'dev'
+                _class: 'eo:Develop'
 
             test done
 
         it 'allows objective override from env', (done) ->
 
-            process.env.NEZ_OBJECTIVE_MODULE = 'NEZ_OBJECTIVE_MODULE'
-            process.env.NEZ_OBJECTIVE_CLASS = 'NEZ_OBJECTIVE_CLASS'
+            process.env.NEZ_OBJECTIVE = 'module:Class'
             Config.hup()
 
             Config.get('objective').should.eql 
 
-                _module: 'NEZ_OBJECTIVE_MODULE'
-                _class: 'NEZ_OBJECTIVE_CLASS'
+                _class: 'module:Class'
 
             test done
 

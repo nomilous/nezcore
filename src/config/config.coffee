@@ -13,8 +13,13 @@ class Config
         #
 
         @objective =
-            _module: process.env.NEZ_OBJECTIVE_MODULE || 'eo'
-            _class:  process.env.NEZ_OBJECTIVE_CLASS  || 'Develop'
+
+            _class: process.env.NEZ_OBJECTIVE || 'eo:Develop'
+
+        @realizer = 
+
+            _class: process.env.NEZ_REALZER || 'ipso:SpecRun'
+            
 
         for key of opts
 
