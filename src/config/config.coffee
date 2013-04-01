@@ -1,3 +1,5 @@
+# eligable? DELETE
+
 fs     = require 'fs'
 
 # 
@@ -7,19 +9,6 @@ fs     = require 'fs'
 class Config
 
     constructor: (opts) -> 
-
-        #
-        # defaults
-        #
-
-        @objective =
-
-            _class: process.env.NEZ_OBJECTIVE || 'eo:Develop'
-
-        @realizer = 
-
-            _class: process.env.NEZ_REALZER || 'ipso:SpecRun'
-            
 
         for key of opts
 
@@ -43,7 +32,10 @@ class Config
 
 if typeof runningConfig == 'undefined'
 
-    runningConfig = new Config
+    runningConfig = new Config secret: 'SEEKRIT'
+                               #
+                               # pending person module
+                               #
 
         
 

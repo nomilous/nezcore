@@ -1,35 +1,10 @@
 require('nez').realize 'Config', (Config, test, context) -> 
 
-    context 'defaults', (it) -> 
+    context 'defaults secret for the time being', (done) -> 
 
-        it 'defaults objective implementation to eo:Develop', (done) -> 
-
-            Config.get('objective').should.eql 
-
-                _class: 'eo:Develop'
-
-            test done
-
-        it 'defaults realization implementation to ipso:SpecRun', (done) -> 
-
-            Config.get('realizer').should.eql 
-
-                _class: 'ipso:SpecRun'
-
-            test done
-
-        it 'allows override from env', (done) ->
-
-            process.env.NEZ_OBJECTIVE = 'Monitor:HostOk'
-            process.env.NEZ_REALZER   = 'Ubuntu:V_12_04_LTS'
-
-            Config.hup()
-
-            Config.get( 'objective' ).should.eql _class: 'Monitor:HostOk'
-            Config.get( 'realizer'  ).should.eql _class: 'Ubuntu:V_12_04_LTS'
-
-            test done
-
+        Config.get('secret').should.equal 'SEEKRIT'
+        test done
+        
 
     context 'from file', (it) -> 
 
