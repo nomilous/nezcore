@@ -32,10 +32,16 @@ class Config
 
 if typeof runningConfig == 'undefined'
 
-    runningConfig = new Config secret: 'SEEKRIT'
-                               #
-                               # pending person module
-                               #
+    runningConfig = new Config 
+
+        #
+        # pending person module
+        #
+
+        secret: 'SEEKRIT'
+        adaptor: 'socket.io'
+        home: 'http://localhost:10101'
+
 
         
 
@@ -62,7 +68,7 @@ module.exports =
         #
 
         # pendingConfig = new Config
-        runningConfig = new Config
+        # runningConfig = new Config
 
 
 
