@@ -1,5 +1,6 @@
 commander = require 'commander'
 Logger    = require '../logger/logger'
+Monitors  = require '../monitor/monitors'
 
 commander.option '-s, --silent',                 'suppresses console output'
 commander.option '-v, --verbose',                'amplify console output'
