@@ -111,11 +111,13 @@ require('nez').realize 'Logger', (Logger, test, context, should, winston) ->
 
             logger.logger.info = (message, meta) -> 
 
-                message.should.equal 'thing'
-                meta.should.eql thing: 'stuff'
+                message.should.equal 'log message'
+                meta.should.eql meta: 'data'
                 test done
 
-            logger.info -> thing: 'stuff'
+            logger.info -> 'log message': 
+
+                meta: 'data'
 
 
         it 'does not call the function if the corresponding level is not active', (done) -> 
@@ -153,7 +155,9 @@ require('nez').realize 'Logger', (Logger, test, context, should, winston) ->
 
                 info: -> 'an info level message'
 
-                verbose: -> ['a verbose level message', meta: 'data']
+                verbose: -> 'a verbose level message': 
+
+                    meta: 'data'
 
 
             calledInfo.should.equal true

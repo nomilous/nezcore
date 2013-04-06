@@ -95,7 +95,7 @@ module.exports = class Logger
 
             for key of message
 
-                return [key, message]
+                return [key, message[key]]
 
 
     loadLevels: (level) -> 
