@@ -89,7 +89,7 @@ require('nez').realize 'Logger', (Logger, test, context, should, winston) ->
                         level: 'info'
                         filename: 'm'
 
-            logger._levels.should.eql 
+            logger.levels.should.eql 
 
                 silly: false
                 verbose: false
@@ -101,17 +101,62 @@ require('nez').realize 'Logger', (Logger, test, context, should, winston) ->
             test done
             
 
-    context 'logs functionally', (done) -> 
+    context 'logs functionally', (it) -> 
 
         winston.Logger = original
 
         logger = new Logger console: level: 'info'
 
-        logger.logger.info = (message, meta) -> 
+        it 'passes a function that returns the log message', (done) ->
 
-            message.should.equal 'thing'
-            meta.should.eql thing: 'stuff'
+            logger.logger.info = (message, meta) -> 
+
+                message.should.equal 'thing'
+                meta.should.eql thing: 'stuff'
+                test done
+
+            logger.info -> thing: 'stuff'
+
+
+        it 'does not call the function if the corresponding level is not active', (done) -> 
+
+            called = false
+            logger.logger.verbose = (message, meta) -> called = true
+
+            logger.verbose -> thing: 'stuff'
+            called.should.equal false
             test done
 
-        logger.info -> thing: 'stuff'
+
+    context 'log() function', (it) -> 
+
+        winston.Logger = original
+
+        logger = new Logger console: level: 'verbose'
+
+        it 'processes more than one log level message', (done) -> 
+
+            calledInfo = false
+            calledVerbose = false
+
+            logger.logger.info = (message, meta) -> 
+                message.should.equal 'an info level message'
+                calledInfo = true
+
+            logger.logger.verbose = (message, meta) -> 
+                message.should.equal 'a verbose level message'
+                meta.should.eql meta: 'data'
+                calledVerbose = true
+
+
+            logger.log 
+
+                info: -> 'an info level message'
+
+                verbose: -> ['a verbose level message', meta: 'data']
+
+
+            calledInfo.should.equal true
+            calledVerbose.should.equal true
+            test done
 

@@ -1,18 +1,18 @@
 winston = require 'winston'
 logger  = undefined
+levels  = 
+    silly: false
+    verbose: false
+    info: false
+    warn: false
+    debug: false
+    error: true
 
 module.exports = class Logger
 
     constructor: (opts = {}) -> 
 
-        @_levels = 
-
-            silly: false
-            verbose: false
-            info: false
-            warn: false
-            debug: false
-            error: true
+        @levels = levels   
 
         transports = []
 
@@ -34,17 +34,52 @@ module.exports = class Logger
                     filename: opts.file.filename
                     level: opts.file.level
 
-        @logger = new winston.Logger
+        logger = @logger = new winston.Logger
   
             transports: transports
 
 
-    silly:   (message) -> @logger.silly.apply null, @process message()
-    verbose: (message) -> @logger.verbose.apply null, @process message()
-    info:    (message) -> @logger.info.apply null, @process message()
-    warn:    (message) -> @logger.warn.apply null, @process message()
-    debug:   (message) -> @logger.debug.apply null, @process message()
-    error:   (message) -> @logger.error.apply null, @process message()
+    silly: (messageFn) -> 
+
+        return unless levels.silly
+        logger.silly.apply null, @process messageFn()
+
+
+    verbose: (messageFn) -> 
+
+        return unless levels.verbose
+        logger.verbose.apply null, @process messageFn()
+
+
+    info: (messageFn) -> 
+
+        return unless levels.info
+        logger.info.apply null, @process messageFn()
+
+
+    warn: (messageFn) -> 
+
+        return unless levels.warn
+        logger.warn.apply null, @process messageFn()
+
+
+    debug: (messageFn) -> 
+
+        return unless levels.debug
+        logger.debug.apply null, @process messageFn()
+
+
+    error: (messageFn) -> 
+
+        return unless levels.error
+        logger.error.apply null, @process messageFn()
+
+    log: (messages) -> 
+
+        for level of messages
+            continue unless levels[level]
+            @[level] messages[level]
+
         
     process: (message) -> 
 
@@ -52,20 +87,25 @@ module.exports = class Logger
 
             return [message]
 
-        else if message instanceof Object
+        else if message instanceof Array
+
+            return message
+
+        else
 
             for key of message
 
                 return [key, message]
 
+
     loadLevels: (level) -> 
 
         active = false
 
-        for _level of @_levels
+        for _level of @levels
 
             active = true if level == _level
 
-            @_levels[_level] = active
+            @levels[_level] = active
 
 
