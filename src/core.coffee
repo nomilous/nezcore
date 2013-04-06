@@ -1,6 +1,13 @@
 module.exports = core =
 
     #
+    # logger
+    #
+
+    logger: require './logger/logger'
+
+
+    #
     # runtime / cli bits
     #
 
