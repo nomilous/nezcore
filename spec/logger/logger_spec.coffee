@@ -1,6 +1,8 @@
-require('nez').realize 'Logger', (Logger, test, context, should) -> 
+require('nez').realize 'Logger', (Logger, test, context, should, winston) -> 
 
-    context 'config', (it, winston) -> 
+    original = winston.Logger
+
+    context 'config', (it) -> 
 
         it 'loads no log transports by default', (done) ->
 
@@ -63,4 +65,53 @@ require('nez').realize 'Logger', (Logger, test, context, should) ->
                     level: 'info'
                     filename: 'm'
 
-        
+    context 'levels', (it) -> 
+
+        winston.Logger = original
+
+        for level in ['silly','verbose','info','warn','debug','error']
+
+            it "implements call for '#{level}'", (done) -> 
+
+                (new Logger)[level].should.be.an.instanceof Function
+                test done
+  
+        it 'knows which log levels are active', (done) -> 
+
+            winston.Logger = class MockLogger
+
+                constructor: (opts) -> 
+
+            logger = new Logger
+                    console: 
+                        level: 'error'
+                    file: 
+                        level: 'info'
+                        filename: 'm'
+
+            logger._levels.should.eql 
+
+                silly: false
+                verbose: false
+                info: true
+                warn: true
+                debug: true
+                error: true
+
+            test done
+            
+
+    context 'logs functionally', (done) -> 
+
+        winston.Logger = original
+
+        logger = new Logger console: level: 'info'
+
+        logger.logger.info = (message, meta) -> 
+
+            message.should.equal 'thing'
+            meta.should.eql thing: 'stuff'
+            test done
+
+        logger.info -> thing: 'stuff'
+
