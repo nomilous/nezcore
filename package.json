@@ -5,7 +5,8 @@
   "dependencies": {
     "inflection": "~1.2.5",
     "wrench": "~1.4.4",
-    "fing": "0.0.5"
+    "fing": "0.0.5",
+    "winston": "~0.6.2"
   },
   "devDependencies": {
     "nez": "0.0.7",
