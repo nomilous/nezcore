@@ -164,3 +164,28 @@ require('nez').realize 'Logger', (Logger, test, context, should, winston) ->
             calledVerbose.should.equal true
             test done
 
+    context 'compatability', (it) -> 
+
+        winston.Logger = original
+
+        logger = new Logger console: level: 'verbose'
+
+        it 'supports standard log()', (done) -> 
+
+            logger.logger.log = (level, message, meta) -> 
+                level.should.equal 'info'
+                message.should.equal 'message'
+                meta.should.eql meta: 'data'
+                test done
+
+            logger.log 'info', 'message', meta: 'data'
+
+        it 'supports standard info()', (done) -> 
+
+            logger.logger.info = (message, meta) -> 
+                console.log 'ARGS', arguments
+                message.should.equal 'message'
+                meta.should.eql meta: 'data'
+                test done
+
+            logger.info 'message', meta: 'data'
