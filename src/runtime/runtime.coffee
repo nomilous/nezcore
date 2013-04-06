@@ -30,9 +30,9 @@ class Runtime
         @loadListen()
         @loadConnect()
 
-        @logger.verbose 'starting runtime' 
-        @logger.verbose 'pending listen', @listen
-        @logger.verbose 'pending connect', @connect
+        @logger.verbose => 'starting runtime' 
+        @logger.verbose => 'pending listen': parameters: @listen
+        @logger.verbose => 'pending connect': parameters: @connect
 
     loadListen: -> 
 
