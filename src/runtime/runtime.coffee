@@ -1,6 +1,7 @@
 commander = require 'commander'
 Logger    = require '../logger/logger'
 Monitors  = require '../monitor/monitors'
+Compilers = require '../compiler/compilers'
 
 commander.option '-s, --silent',                 'suppresses console output'
 commander.option '-v, --verbose',                'amplify console output'
@@ -38,6 +39,12 @@ class Runtime
         #
 
         @loadMonitors commander
+
+        #
+        # runtime provides compilers
+        # 
+
+        @loadCompilers commander
 
 
         @loadListen()
@@ -106,6 +113,11 @@ class Runtime
     loadMonitors: (commander) -> 
 
         @monitors = Monitors
+
+
+    loadCompilers: (commander) -> 
+
+        @compilers = Compilers
 
 
 module.exports = Runtime

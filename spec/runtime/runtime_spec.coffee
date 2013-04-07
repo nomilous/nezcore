@@ -25,3 +25,13 @@ require('nez').realize 'Runtime', (Runtime, test, context, should) ->
                 uri: 'http://localhost:10101'
 
             test done
+
+        it 'provides monitors', (done) -> 
+
+            (new Runtime).monitors.should.equal require '../../lib/monitor/monitors'
+            test done
+
+        it 'provides compilers', (done) -> 
+
+            (new Runtime).compilers.should.equal require '../../lib/compiler/compilers'
+            test done
