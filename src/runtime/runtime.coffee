@@ -27,7 +27,19 @@ class Runtime
 
         commander.parse process.argv
 
+        #
+        # runtime provides a logger
+        #
+
         @loadLogger commander
+
+        #
+        # runtime provides monitors
+        #
+
+        @loadMonitors commander
+
+
         @loadListen()
         @loadConnect()
 
@@ -82,12 +94,18 @@ class Runtime
 
         if commander.logFile
 
+            level = commander.logFileLevel if commander.logFileLevel
+
             opts.file = 
 
                 level: level
                 filename: commander.logFile
 
         @logger = new Logger opts
+
+    loadMonitors: (commander) -> 
+
+        @monitors = Monitors
 
 
 module.exports = Runtime
