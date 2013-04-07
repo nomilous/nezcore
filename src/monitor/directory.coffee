@@ -6,7 +6,9 @@ module.exports =
 
         try
 
-            hound.watch path
+            hound.watch(path).on 'change', (file, stats) -> 
+
+                callback null, file, stats
 
         catch error
 
