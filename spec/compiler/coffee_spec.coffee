@@ -1,7 +1,22 @@
-require('nez').realize 'Coffee', (Coffee, test, context) -> 
+require('nez').realize 'Coffee', (Coffee, test, it, should) -> 
 
-    context 'in CONTEXT', (does) ->
+    it 'compiles coffee-script', (done, fs) ->
 
-        does 'an EXPECTATION', (done) ->
+        fs.readFileSync = -> 
 
+            console.log arguments
+
+            return """ 
+
+                require 'milk'
+                require 'sugar'
+                require mug'
+                require 'teaspoon'
+                require 'kettle'
+
+            """
+
+        Coffee.compile {}, 'FILE', (error) -> 
+
+            should.exist error
             test done
