@@ -49,11 +49,15 @@ module.exports = compiler =
             fs.lstatSync file
 
             #
-            # a file already exists at spec path
+            # a file already exists at specpath
             #
 
-            callback null, false
+            callback null, file
             return
+
+        catch error
+
+            throw error unless error.code == 'ENOENT'
 
         try
 
@@ -74,16 +78,20 @@ module.exports = compiler =
                     it 'does an EXPECTATION', (done) ->
 
                         test done
-
-
+            
             """
 
-            callback null, true
+            #
+            # created spec file, hound will see it
+            # so no need to pass the specFile to callback 
+            #
+
+            callback null
             return
 
         catch error
 
-            callback error, false
+            callback error
             return
 
        

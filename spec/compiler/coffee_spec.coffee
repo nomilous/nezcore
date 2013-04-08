@@ -62,28 +62,25 @@ require('nez').realize 'Coffee', (Coffee, test, it, should) ->
             madeDir = true
 
         madeSpec = false
-        fs.lstatSync = -> 
-            throw 'cant lstat'
-
         fs.writeFileSync = (file, content) ->
 
             file.should.equal '/path/to/repo/spec/dir/class_name_spec.coffee'
-            content.should.equal 'require(\'nez\').realize \'ClassName\', (context, test, ClassName) -> \n\n    context \'in CONTEXT\', (it) ->\n\n        it \'does an EXPECTATION\', (done) ->\n\n            test done\n\n'
+            content.should.equal 'require(\'nez\').realize \'ClassName\', (context, test, ClassName) -> \n\n    context \'in CONTEXT\', (it) ->\n\n        it \'does an EXPECTATION\', (done) ->\n\n            test done\n'
             madeSpec = true
 
         Coffee.ensureSpec {}, 
 
             src: '/path/to/repo/src'
             spec: '/path/to/repo/spec'
-            file: '/path/to/repo/src/dir/class_name.coffee', (error, created) -> 
+            file: '/path/to/repo/src/dir/class_name.coffee', (error, specFile) -> 
 
-                created.should.equal true
+                should.not.exist specFile
                 madeDir.should.equal true
                 madeSpec.should.equal true
                 test done
-                
 
-    it 'makes no changes if spec file already exists', (done, fs, wrench) -> 
+
+    it 'calls back with existing specfile if not created', (done, fs, wrench) -> 
 
         fs.lstatSync = -> 'does not throw'
         wrench.mkdirSyncRecursive = -> throw 'THIS SHOULD NOT BE CALLED'
@@ -92,9 +89,9 @@ require('nez').realize 'Coffee', (Coffee, test, it, should) ->
 
             src: '/path/to/repo/src'
             spec: '/path/to/repo/spec'
-            file: '/path/to/repo/src/dir/class_name.coffee', (error, created) -> 
+            file: '/path/to/repo/src/dir/class_name.coffee', (error, specFile) -> 
 
-                created.should.equal false
+                specFile.should.equal '/path/to/repo/spec/dir/class_name_spec.coffee'
                 test done
 
 
