@@ -4,15 +4,24 @@ colors = require 'colors'
 
 module.exports = compiler = 
 
-    compile: (logger, file, callback) -> 
+    compile: (logger, config, callback) -> 
+
+        inFile  = config.file
+        outFile = config.file.replace config.src, ''
+        outPath = config.dst + outFile
 
         try
 
-            source = fs.readFileSync(file).toString()
+            source = fs.readFileSync( inFile ).toString()
 
-            js = coffee.compile source, bare: true
+            js = coffee.compile source, 
 
-            console.log 'TODO: write compiled file'
+                bare: true
+                header: true
+
+            file = outPath.replace /\.coffee$/, '.js'
+
+            fs.writeFileSync file, js
 
             callback null
 
@@ -20,12 +29,12 @@ module.exports = compiler =
 
             if error.toString().match /SyntaxError/
 
-                compiler.showError file, source, error
+                compiler.showError config.src, outFile, source, error
 
             callback error
 
 
-    showError: (file, source, error) -> 
+    showError: (path, file, source, error) -> 
 
         first_line = error.location.first_line
         last_line = error.location.last_line
@@ -39,7 +48,7 @@ module.exports = compiler =
 
         
         
-        console.log '\nFile:', file
+        console.log '\nFile:', path + file.bold
         console.log 'SyntaxError:', error.message.bold.red, '\n'
         for num in [start..end]
 
