@@ -1,6 +1,9 @@
-fs     = require 'fs'
-coffee = require 'coffee-script'
-colors = require 'colors'
+fs         = require 'fs'
+path       = require 'path'
+wrench     = require 'wrench'
+coffee     = require 'coffee-script'
+colors     = require 'colors'
+inflection = require 'inflection'
 
 module.exports = compiler = 
 
@@ -19,6 +22,8 @@ module.exports = compiler =
                 bare: true
                 header: true
 
+            wrench.mkdirSyncRecursive path.dirname( outPath ), '0755'
+
             file = outPath.replace /\.coffee$/, '.js'
 
             fs.writeFileSync file, js
@@ -32,6 +37,57 @@ module.exports = compiler =
                 compiler.showError config.src, outFile, source, error
 
             callback error
+
+    ensureSpec: (logger, config, callback) -> 
+
+        create   = false
+        outFile  = config.file.replace config.src, ''
+        specFile = outFile.replace /\.coffee$/, '_spec.coffee'
+        file     = config.spec + specFile
+
+        try 
+            fs.lstatSync file
+
+            #
+            # a file already exists at spec path
+            #
+
+            callback null, false
+            return
+
+        try
+
+
+            #
+            # TODO: allow configable default spec snippet 
+            #
+
+            basename  = path.basename(config.file).replace /\.coffee$/, ''
+            classname = inflection.camelize basename
+
+            wrench.mkdirSyncRecursive path.dirname( file ), '0755'
+            fs.writeFileSync file, """
+            require('nez').realize '#{classname}', (context, test, #{classname}) -> 
+
+                context 'in CONTEXT', (it) ->
+
+                    it 'does an EXPECTATION', (done) ->
+
+                        test done
+
+
+            """
+
+            callback null, true
+            return
+
+        catch error
+
+            callback error, false
+            return
+
+       
+        
 
 
     showError: (path, file, source, error) -> 
