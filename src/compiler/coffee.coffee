@@ -7,7 +7,7 @@ inflection = require 'inflection'
 
 module.exports = compiler = 
 
-    compile: (logger, config, callback) -> 
+    compile: (config, callback) -> 
 
         inFile  = config.file
         outFile = config.file.replace config.src, ''
@@ -38,7 +38,7 @@ module.exports = compiler =
 
             callback error
 
-    ensureSpec: (logger, config, callback) -> 
+    ensureSpec: (config, callback) -> 
 
         create   = false
         outFile  = config.file.replace config.src, ''
