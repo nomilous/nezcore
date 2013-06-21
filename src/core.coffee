@@ -1,30 +1,33 @@
 module.exports = core =
 
-    #
-    # logger
-    #
-
-    logger: require './logger/logger'
+    monitor: require './monitor/monitor'
 
 
-    #
-    # runtime / cli bits
-    #
+    # #
+    # # logger
+    # #
 
-    runtime: require './runtime/runtime'
-
-
-    #
-    # for runtime injection
-    #
-
-    injector: require './injector/injector'
+    # logger: require './logger/logger'
 
 
-    #
-    # for configuration
-    #
+    # #
+    # # runtime / cli bits
+    # #
 
-    config: require './config/config'
+    # runtime: require './runtime/runtime'
 
-    
+
+    # #
+    # # for runtime injection
+    # #
+
+    # injector: require './injector/injector'
+
+
+    # #
+    # # for configuration
+    # #
+
+    # config: require './config/config'
+
+    # 

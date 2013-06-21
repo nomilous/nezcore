@@ -1,3 +1,13 @@
+
+#
+#
+#
+
+console.log 'nonsense!, delete', __filename
+
+
+
+
 winston = require 'winston'
 logger  = undefined
 levels  = 
