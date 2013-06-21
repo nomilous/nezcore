@@ -1,15 +1,13 @@
 hound = require 'hound'
 
-module.exports = 
+module.exports = (path, callback) -> 
 
-    watch: (path, callback) -> 
+    try
 
-        try
+        hound.watch(path).on 'change', (file, stats) -> 
 
-            hound.watch(path).on 'change', (file, stats) -> 
+            callback null, file, stats
 
-                callback null, file, stats
+    catch error
 
-        catch error
-
-            callback error
+        callback error

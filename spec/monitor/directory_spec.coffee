@@ -4,7 +4,7 @@ require('nez').realize 'Directory', (Directory, test, context) ->
 
         it 'calls with ENOENT', (done) -> 
 
-            Directory.watch '/path', (error, callback) -> 
+            Directory '/path', (error, callback) -> 
 
                 error.code.should.equal 'ENOENT'
                 error.message.should.match /no such file or directory/
