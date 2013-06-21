@@ -21,10 +21,11 @@ module.exports = compiler =
 
                 bare: true
                 header: true
+                literate: outFile.match(/litcoffee/)?
 
             wrench.mkdirSyncRecursive path.dirname( outPath ), '0755'
 
-            file = outPath.replace /\.coffee$/, '.js'
+            file = outPath.replace /\.(lit)*coffee$/, '.js'
 
             fs.writeFileSync file, js
 
@@ -42,8 +43,9 @@ module.exports = compiler =
 
         create   = false
         outFile  = config.file.replace config.src, ''
-        specFile = outFile.replace /\.coffee$/, '_spec.coffee'
+        specFile = outFile.replace /\.(lit)*coffee$/, '_spec.coffee'
         file     = config.spec + specFile
+
 
         try 
             fs.lstatSync file
@@ -66,16 +68,16 @@ module.exports = compiler =
             # TODO: allow configable default spec snippet 
             #
 
-            basename  = path.basename(config.file).replace /\.coffee$/, ''
+            basename  = path.basename(config.file).replace /\.(lit)*coffee$/, ''
             classname = inflection.camelize basename
 
             wrench.mkdirSyncRecursive path.dirname( file ), '0755'
             fs.writeFileSync file, """
             require('nez').realize '#{classname}', (context, test, #{classname}) -> 
 
-                context 'in CONTEXT', (it) ->
+                context 'context', (it) ->
 
-                    it 'does an EXPECTATION', (done) ->
+                    it 'does something', (done) ->
 
                         test done
             
