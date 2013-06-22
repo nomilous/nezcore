@@ -14,7 +14,7 @@ require('nez').realize 'Coffee', (Coffee, test, it, should) ->
 
             """
 
-        Coffee.compile 
+        Coffee.compile {},
 
             src: '/path/to/repo/src'
             dst: '/path/to/repo/lib'
@@ -46,7 +46,7 @@ require('nez').realize 'Coffee', (Coffee, test, it, should) ->
             madeDir.should.equal true
             test done
 
-        Coffee.compile
+        Coffee.compile {},
 
             src: '/path/to/repo/src'
             dst: '/path/to/repo/lib'
@@ -68,7 +68,7 @@ require('nez').realize 'Coffee', (Coffee, test, it, should) ->
             content.should.equal 'require(\'nez\').realize \'ClassName\', (context, test, ClassName) -> \n\n    context \'context\', (it) ->\n\n        it \'does something\', (done) ->\n\n            test done\n'
             madeSpec = true
 
-        Coffee.ensureSpec
+        Coffee.ensureSpec {},
 
             src: '/path/to/repo/src'
             spec: '/path/to/repo/spec'
@@ -85,7 +85,7 @@ require('nez').realize 'Coffee', (Coffee, test, it, should) ->
         fs.lstatSync = -> 'does not throw'
         wrench.mkdirSyncRecursive = -> throw 'THIS SHOULD NOT BE CALLED'
 
-        Coffee.ensureSpec
+        Coffee.ensureSpec {},
 
             src: '/path/to/repo/src'
             spec: '/path/to/repo/spec'

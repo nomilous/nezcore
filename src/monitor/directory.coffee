@@ -1,6 +1,6 @@
 hound = require 'hound'
 
-module.exports = (path, callback) -> 
+module.exports = (notice, path, callback) -> 
 
     try
 

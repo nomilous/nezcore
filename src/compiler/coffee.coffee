@@ -7,7 +7,7 @@ inflection = require 'inflection'
 
 module.exports = compiler = 
 
-    compile: (config, callback) -> 
+    compile: (notice, config, callback) -> 
 
         inFile  = config.file
         outFile = config.file.replace config.src, ''
@@ -29,7 +29,7 @@ module.exports = compiler =
 
             fs.writeFileSync file, js
 
-            callback null
+            return callback null
 
         catch error
 
@@ -39,7 +39,7 @@ module.exports = compiler =
 
             callback error
 
-    ensureSpec: (config, callback) -> 
+    ensureSpec: (notice, config, callback) -> 
 
         create   = false
         outFile  = config.file.replace config.src, ''
@@ -59,7 +59,7 @@ module.exports = compiler =
 
         catch error
 
-            throw error unless error.code == 'ENOENT'
+            callback error unless error.code == 'ENOENT'
 
         try
 
