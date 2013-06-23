@@ -1,7 +1,33 @@
-require('nez').realize 'Spawn', (Spawn, test, context) -> 
+require('nez').realize 'Spawn', (Spawn, test, it) -> 
 
-    context 'in CONTEXT', (does) ->
+    it 'spawns a child process with the coffee interpreter', (done) -> 
+        
+        Spawn 
 
-        does 'an EXPECTATION', (done) ->
+            arguments: ['res/test.coffee']
 
-            test done
+            (error, child) -> 
+
+                child.stdout.on 'data', (data) -> 
+
+                    if data.toString().match(/OK/)? 
+
+                        test done
+                        
+
+    it 'inherits parents env', (done) -> 
+
+        process.env['VARIABLE'] = 'VALUE'
+
+        Spawn
+
+            arguments: ['res/test.coffee']        
+
+            (error, child) -> 
+
+                child.stdout.on 'data', (data) -> 
+
+                    if data.toString().match(/VALUE/)?
+
+                         test done
+
