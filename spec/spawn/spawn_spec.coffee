@@ -1,8 +1,11 @@
 require('nez').realize 'Spawn', (Spawn, test, it) -> 
 
+    EVENTS   = {}
+    NOTIFIER = event: bad: (title, payload) -> EVENTS[title] = payload
+
     it 'spawns a child process with the coffee interpreter', (done) -> 
         
-        Spawn 
+        Spawn NOTIFIER,
 
             arguments: ['res/test.coffee']
 
@@ -13,15 +16,15 @@ require('nez').realize 'Spawn', (Spawn, test, it) ->
                     if data.toString().match(/OK/)? 
 
                         test done
-                        
+
 
     it 'inherits parents env', (done) -> 
 
         process.env['VARIABLE'] = 'VALUE'
 
-        Spawn
+        Spawn NOTIFIER,
 
-            arguments: ['res/test.coffee']        
+            arguments: ['res/test.coffee']
 
             (error, child) -> 
 
@@ -31,3 +34,23 @@ require('nez').realize 'Spawn', (Spawn, test, it) ->
 
                          test done
 
+
+    it 'notifies on exit', (done) -> 
+
+        Spawn NOTIFIER,
+
+            arguments: ['res/test.coffee']        
+
+            (error, child) -> 
+
+                setTimeout (->
+
+                    EVENTS['child exited'].should.eql 
+
+                        code: 255
+                        signal: ''
+
+                    test done
+
+                ), 1000
+        

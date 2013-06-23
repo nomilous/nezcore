@@ -1,11 +1,42 @@
 spawn = require('child_process').spawn
 path  = require 'path'
 
-module.exports = (opts, callback) -> 
+module.exports = (notice, opts, callback) -> 
 
     #
     # start script on the local coffee interpreter 
     #
 
     command = path.normalize __dirname + '/../../node_modules/.bin/coffee'
-    callback null, spawn command, opts.arguments
+    child   = spawn command, opts.arguments
+
+
+    #
+    # terminating child notifies (event.bad)
+    #
+
+    child.on 'exit', (code, signal) -> 
+
+        if code != 0 
+
+            return notice.event.bad 'child exited'
+
+                code:   code
+                signal: signal || ''
+
+        notice.event 'child exited'
+
+            code:   code
+            signal: signal || ''
+
+    
+    #
+    # todo: vanishing output from script could become important
+    # 
+    #       hmmmmm? > 
+    #
+
+    child.stderr.on 'data', (data) -> 
+    child.stdout.on 'data', (data) -> 
+
+    callback null, child
