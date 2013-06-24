@@ -23,6 +23,10 @@ module.exports = compiler =
                 header: true
                 literate: outFile.match(/litcoffee/)?
 
+            unless config.dst? 
+
+                return callback null, js
+
             wrench.mkdirSyncRecursive path.dirname( outPath ), '0755'
 
             file = outPath.replace /\.(lit)*coffee$/, '.js'
