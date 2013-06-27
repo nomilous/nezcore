@@ -17,6 +17,8 @@ module.exports = (notice, opts, callback) ->
 
     child.on 'exit', (code, signal) -> 
 
+        opts.exit child.pid if typeof opts.exit == 'function'
+
         if code != 0 
 
             return notice.event.bad 'child exited'

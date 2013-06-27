@@ -53,4 +53,23 @@ require('nez').realize 'Spawn', (Spawn, test, it) ->
                     test done
 
                 ), 1000
-        
+
+
+    it 'calls opts.exit() with pid on exit', (done) -> 
+
+        PID = undefined
+
+        Spawn NOTIFIER,
+
+            arguments: ['res/test.coffee']
+
+            exit: (pid) -> 
+
+                pid.should.equal PID
+                test done
+
+            (error, child) -> 
+
+                PID = child.pid
+
+                
