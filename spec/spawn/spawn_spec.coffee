@@ -63,9 +63,10 @@ require('nez').realize 'Spawn', (Spawn, test, it) ->
 
             arguments: ['res/test.coffee']
 
-            exit: (pid) -> 
+            exit: (pid, code, signal) -> 
 
                 pid.should.equal PID
+                code.should.equal 255
                 test done
 
             (error, child) -> 
