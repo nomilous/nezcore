@@ -25,11 +25,16 @@ module.exports = (notice, opts, callback) ->
 
             return notice.event.bad 'child exited'
 
+                opts:   opts
+                pid:    child.pid
                 code:   code
                 signal: signal || ''
 
+
         notice.event 'child exited'
 
+            opts:   opts
+            pid:    child.pid
             code:   code
             signal: signal || ''
 

@@ -45,10 +45,11 @@ require('nez').realize 'Spawn', (Spawn, test, it) ->
 
                 setTimeout (->
 
-                    EVENTS['child exited'].should.eql 
+                    event = EVENTS['child exited']
 
-                        code: 255
-                        signal: ''
+                    event.code.should.equal 255
+                    event.opts.arguments.should.eql ['res/test.coffee']
+
 
                     test done
 
