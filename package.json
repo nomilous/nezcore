@@ -9,7 +9,8 @@
     "winston": "~0.6.2",
     "hound": "~1.0.4",
     "colors": "~0.6.0-1",
-    "coffee-script": "~1.6.3"
+    "coffee-script": "~1.6.3",
+    "node-uuid": "~1.4.0"
   },
   "devDependencies": {
     "nez": "0.0.7",

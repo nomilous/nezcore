@@ -82,7 +82,7 @@ require('nez').realize 'Coffee', (Coffee, test, it, should) ->
         fs.writeFileSync = (file, content) ->
 
             file.should.equal '/path/to/repo/spec/dir/class_name_spec.coffee'
-            content.should.equal 'require(\'nez\').realize \'ClassName\', (context, test, ClassName) -> \n\n    context \'context\', (it) ->\n\n        it \'does something\', (done) ->\n\n            test done\n'
+            content.should.match /require\('nez'\)\.realize/
             madeSpec = true
 
         Coffee.ensureSpec {},

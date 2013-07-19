@@ -4,6 +4,7 @@ wrench     = require 'wrench'
 coffee     = require 'coffee-script'
 colors     = require 'colors'
 inflection = require 'inflection'
+uuid       = require 'node-uuid'
 
 module.exports = compiler = 
 
@@ -50,13 +51,22 @@ module.exports = compiler =
         specFile = outFile.replace /\.(lit)*coffee$/, '_spec.coffee'
         file     = config.spec + specFile
 
-
         try 
             fs.lstatSync file
 
             #
             # a file already exists at specpath
             #
+
+            try
+
+                buff = fs.readFileSync file
+                content = buff.toString()
+
+                unless content.match /###\s*TASK/
+
+                    content = "### TASK #{uuid.v1()} ###\n\n" + content
+                    fs.writeFileSync file, content
 
             callback null, file
             return
@@ -77,6 +87,8 @@ module.exports = compiler =
 
             wrench.mkdirSyncRecursive path.dirname( file ), '0755'
             fs.writeFileSync file, """
+            ### TASK #{uuid.v1()} ###
+
             require('nez').realize '#{classname}', (context, test, #{classname}) -> 
 
                 context 'context', (it) ->
