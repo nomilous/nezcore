@@ -73,13 +73,13 @@ module.exports = compiler =
                 buff = fs.readFileSync file
                 content = buff.toString()
 
-                unless content.match /###\s*UUID/
+                unless content.match /###\s*REALIZER/
 
                     #
                     # Attach unique identider to spec if not present
                     #
 
-                    content = "### UUID #{uuid.v1()} ###\n\n" + content
+                    content = "### REALIZER #{uuid.v1()} ###\n\n" + content
                     fs.writeFileSync file, content
 
             callback null, file
@@ -101,7 +101,7 @@ module.exports = compiler =
 
             wrench.mkdirSyncRecursive path.dirname( file ), '0755'
             fs.writeFileSync file, """
-            ### UUID #{uuid.v1()} ###
+            ### REALIZER #{uuid.v1()} ###
 
             require('nez').realize '#{classname}', (context, test, #{classname}) -> 
 
