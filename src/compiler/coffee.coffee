@@ -48,10 +48,20 @@ module.exports = compiler =
 
         create   = false
         outFile  = config.file.replace config.src, ''
-        specFile = outFile.replace /\.(lit)*coffee$/, '_spec.coffee'
-        file     = config.spec + specFile
+
+        
+
+        if outFile.match /_spec\.coffee$/
+
+            file = config.spec + outFile
+
+        else
+
+            specFile = outFile.replace /\.(lit)*coffee$/, '_spec.coffee'
+            file     = config.spec + specFile
 
         try 
+
             fs.lstatSync file
 
             #
@@ -63,9 +73,13 @@ module.exports = compiler =
                 buff = fs.readFileSync file
                 content = buff.toString()
 
-                unless content.match /###\s*TASK/
+                unless content.match /###\s*UUID/
 
-                    content = "### TASK #{uuid.v1()} ###\n\n" + content
+                    #
+                    # Attach unique identider to spec if not present
+                    #
+
+                    content = "### UUID #{uuid.v1()} ###\n\n" + content
                     fs.writeFileSync file, content
 
             callback null, file
@@ -87,7 +101,7 @@ module.exports = compiler =
 
             wrench.mkdirSyncRecursive path.dirname( file ), '0755'
             fs.writeFileSync file, """
-            ### TASK #{uuid.v1()} ###
+            ### UUID #{uuid.v1()} ###
 
             require('nez').realize '#{classname}', (context, test, #{classname}) -> 
 
