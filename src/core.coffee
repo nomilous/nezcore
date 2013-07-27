@@ -2,6 +2,7 @@ module.exports = core =
 
     monitor:  require './monitor/monitor'
     compiler: require './compiler/compiler'
+    parser:   require './parser/parser'
     spawn:    require './spawn/spawn'
     checksum: require './checksum/checksum'
 
