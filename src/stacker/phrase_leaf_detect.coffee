@@ -1,3 +1,5 @@
+{fn} = require '../parser/js'
+
 module.exports = 
 
     #
@@ -32,4 +34,15 @@ module.exports =
 
             return isLeaf false
 
-        isLeaf true
+        parser = fn.parser()
+
+        parser.on 'closure', (heap) -> 
+
+            console.log heap
+
+        parser.on 'end', -> 
+
+            isLeaf true
+
+        parser.parse params.fn.toString()
+
