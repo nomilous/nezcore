@@ -15,7 +15,8 @@
   },
   "devDependencies": {
     "nez": "0.0.7",
-    "should": "~1.2.2"
+    "should": "~1.2.2",
+    "mocha": "~1.12.0"
   },
   "main": "lib/core",
   "repository": "git@github.com:nomilous/nezcore.git"
