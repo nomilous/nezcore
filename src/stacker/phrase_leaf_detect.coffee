@@ -67,8 +67,52 @@ module.exports =
             rootFn  = heap[0]
             doneSig = rootFn.signature[0]
 
-            known = true
-            isLeaf true
+            #
+            # loop into the closure heap for in search of 
+            # argless call to doneSig
+            #
+            depth = 0
+            for closure in heap
+
+                depth++
+                for statement in closure.statements
+
+                    if match = statement.match new RegExp "#{doneSig}\\(\\)"
+
+                        #
+                        # doneSig() has been called in statement
+                        #
+
+                        if depth == 1
+
+                            #
+                            # called as statement in the rootFn, 
+                            # definately a leaf
+                            # 
+
+                            known = true
+                            isLeaf true
+
+                        else
+
+                            #
+                            # called as statement in nested function
+                            # is only a leaf if:
+                            # ------------------
+                            # 
+                            # * done is not a local variable declared
+                            #   or passed into this nested function
+                            # 
+                            # * done is not a variable scoped to the
+                            #   parent function, but the parent is 
+                            #   also not the root 
+                            # 
+
+                            console.log todo: 'The Scope of DoneSig' 
+
+                            known = true
+                            isLeaf true
+
 
         parser.on 'end', -> 
 
