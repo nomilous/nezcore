@@ -12,6 +12,10 @@ module.exports =
 
     create: (context, notice, realizerFn, tester) -> 
 
+                                            #
+                                            # TODO: tester not appropriate here
+                                            #
+
         stack   = []
 
         #
@@ -146,6 +150,8 @@ module.exports =
 
                         return control.beforeEach done unless control.global
                         return control.beforeEach.call null, done
+
+                    else done()
 
                     
 
