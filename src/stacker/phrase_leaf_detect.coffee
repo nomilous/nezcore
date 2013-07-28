@@ -47,6 +47,12 @@ module.exports =
 
         parser = fn.parser()
         known  = false
+
+
+        parser.on 'end', -> 
+
+            return if known
+            isLeaf false
         
 
         parser.on 'closure', (heap) -> 
@@ -108,12 +114,6 @@ module.exports =
 
                             known = true
                             isLeaf true
-
-
-        parser.on 'end', -> 
-
-            return if known
-            isLeaf false
 
 
         parser.parse params.fn.toString()
