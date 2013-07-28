@@ -111,6 +111,35 @@ describe 'PhraseLeafDetect', ->
                         done()
 
 
+            xit 'supports this sort of thing', (done) -> 
+
+                PhraseLeafDetect.default
+
+                    phrase: 'phrase'
+                    fn: (done) -> 
+                        why = (done) -> done()
+                        why done
+
+                    (leaf) -> 
+
+                        leaf.should.equal true
+                        done()
+
+            xit 'supports this sort of thing too', (done) -> 
+
+                PhraseLeafDetect.default
+
+                    phrase: 'phrase'
+                    fn: (done) -> 
+                        setTimeout done, 200
+
+                    (leaf) -> 
+
+                        leaf.should.equal true
+                        done()
+
+
+
             it 'the call to done refers to a variable declared in the nested scope'
 
 

@@ -66,18 +66,34 @@ module.exports =
 
             rootFn  = heap[0]
             doneSig = rootFn.signature[0]
+            matcher = new RegExp "#{doneSig}\\(\\)"
 
             #
-            # loop into the closure heap for in search of 
-            # argless call to doneSig
-            #
-            depth = 0
+            # loop into the closure heap in search of 
+            # argless call to doneSig, 
+            # 
+
+            depth         = 0
+            declaredDepth = 0
+
             for closure in heap
 
                 depth++
+
+                unless closure.signature.indexOf(doneSig) < 0 
+
+                    #
+                    # this function has doneSig passed in, if it is 
+                    # not the root function of the phrase then any 
+                    # call to doneSig at this or greater depth is 
+                    # not eligable for leafhood considderation
+                    # 
+
+                    declaredDepth = depth
+
                 for statement in closure.statements
 
-                    if match = statement.match new RegExp "#{doneSig}\\(\\)"
+                    if match = statement.match matcher
 
                         #
                         # doneSig() has been called in statement
@@ -95,23 +111,15 @@ module.exports =
 
                         else
 
-                            #
-                            # called as statement in nested function
-                            # is only a leaf if:
-                            # ------------------
-                            # 
-                            # * done is not a local variable declared
-                            #   or passed into this nested function
-                            # 
-                            # * done is not a variable scoped to the
-                            #   parent function, but the parent is 
-                            #   also not the root 
-                            # 
+                            if declaredDepth == 1
 
-                            console.log todo: 'The Scope of DoneSig' 
+                                #
+                                # doneSig still refers onto the 
+                                # root function's scope
+                                # 
 
-                            known = true
-                            isLeaf true
+                                known = true
+                                isLeaf true
 
 
         parser.on 'end', -> 
