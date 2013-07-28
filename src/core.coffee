@@ -1,5 +1,6 @@
 module.exports = core =
-
+    
+    stacker:  require './stacker/stacker'
     monitor:  require './monitor/monitor'
     compiler: require './compiler/compiler'
     parser:   require './parser/parser'
