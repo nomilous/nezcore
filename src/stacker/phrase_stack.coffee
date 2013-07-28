@@ -1,5 +1,6 @@
-{argsOf} = require('also').util
-{async}  = require('also').inject
+{argsOf}   = require('also').util
+{async}    = require('also').inject
+LeafDetect = require './phrase_leaf_detect' 
 
 #
 # PhraseStack 
@@ -18,34 +19,7 @@ module.exports =
 
         stack   = []
 
-        #
-        # leaf detection (for leafOnly: true)
-        # -----------------------------------
-        # 
-        # * Defaults to matching for a phrase whose first argument is a function 
-        #   that is not called with arguments.
-        # 
-        #   ie.
-        # 
-        #   it 'is not a leaf', (because) ->        
-        #  
-        #       because 'because is called with arguments', (but) -> 
-        #  
-        #           but 'this is a leaf', (done) ->
-        # 
-        #               done() # has no arguments
-        #   
-        # * Setting context.isLeaf (function) will override. It receives the
-        #   the phrase function definition as arg1.fn and should callback if 
-        #   the phrase is a leaf.
-        # 
-        # * It MUST callback only once.
-        # 
-        # 
-
-        context.isLeaf ||= (params, isLeaf) -> 
-
-            isLeaf true
+        context.isLeaf ||= LeafDetect.default
 
         #
         # when context.leafOnly == true a hook stack is accumulated

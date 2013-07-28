@@ -7,7 +7,7 @@ describe 'PhraseStack', ->
     NOTICE   = {}
     REALIZER = (root, test) -> 
 
-    xcontext 'create()', ->
+    context 'create()', ->
 
         it 'is a function', (done) -> 
 
@@ -20,7 +20,7 @@ describe 'PhraseStack', ->
             stacker.should.be.an.instanceof Function
             done()
 
-    xcontext 'is used to build a phrase stack', -> 
+    context 'is used to build a phrase stack', -> 
 
         it 'exposes the stack and top properties', (done) -> 
 
@@ -162,11 +162,27 @@ describe 'PhraseStack', ->
                 COUNT.should.equal 5
                 done()
 
+        it 'uses a default leaf detector', (done) -> 
+
+            phraseFn = ->
+
+            require('../../lib/stacker/phrase_leaf_detect').default = (params, isLeaf) -> 
+
+                params.should.eql 
+
+                    element: 'root'
+                    phrase:  'outer phrase'
+                    fn:      phraseFn
+
+                done()
+                
+            stacker = PhraseStack.create leafOnly: true, NOTICE, REALIZER
+            stacker 'outer phrase', phraseFn
 
 
-        it 'can be set to only run beforeEach and afterEach hooks upon encountering a leaf node', (done) -> 
+        xit 'can be set to only run beforeEach and afterEach hooks upon encountering a leaf node', (done) -> 
 
-            done 'not'
+            
             #
             # IMPORTANT
             # 
@@ -187,7 +203,6 @@ describe 'PhraseStack', ->
             stacker = PhraseStack.create {
 
                 leafOnly: true
-                tools: require '../../lib/core'
 
             }, NOTICE, REALIZER
 
@@ -260,7 +275,7 @@ describe 'PhraseStack', ->
                 done()
 
 
-        it 'can optionally enforce global scope', (done) -> 
+        xit 'can optionally enforce global scope', (done) -> 
 
             done 'not'
 
@@ -302,6 +317,7 @@ describe 'PhraseStack', ->
                     afterAll:   4
 
                 done()
+
 
     context 'timeout', (it) -> 
 
