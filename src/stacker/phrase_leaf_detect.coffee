@@ -26,4 +26,10 @@ module.exports =
     # 
     # 
 
-    default: -> 
+    default: (params, isLeaf) -> 
+
+        unless params.phrase? 
+
+            return isLeaf false
+
+        isLeaf true
