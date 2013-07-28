@@ -77,17 +77,19 @@ exports.fn =
                             # store and reset accumulated statement 
                             #
 
-                            statement = statement.replace /^[\s]+|\.|[\s]+$/g, ''
+                            statement = statement.replace /^[\s]+/g, ''
+                            statement = statement.replace /[\s]+$/g, ''
+
 
                             if vars = statement.match /^var\s(.*)/
 
                                 vars[1].split(',').map (variable) -> 
 
-                                    fn.variables.push variable.replace /^[\s]+|\.|[\s]+$/g, ''
+                                    fn.variables.push variable.replace /^[\s]+/g, ''
 
                             else 
 
-                                fn.statements.push statement.replace /^[\s]+|\.|[\s]+$/g, ''
+                                fn.statements.push statement
                             
                             statement = ''
 
@@ -106,7 +108,8 @@ exports.fn =
                         # remove leading and trailing whitespace
                         #
 
-                        fn.body = fn.body.replace /^[\s]+|\.|[\s]+$/g, ''
+                        fn.body = fn.body.replace /^[\s]+/g, ''
+                        fn.body = fn.body.replace /[\s]+$/g, ''
                         break
 
                 if fn.signature[0] == '' then fn.signature = []
