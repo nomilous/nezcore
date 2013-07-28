@@ -1,5 +1,10 @@
 {EventEmitter} = require 'events'
 
+#
+# resurse into a function definition and emit the 'closure heap' 
+# at every leaf node
+#
+
 exports.fn = 
 
     parser: -> 
@@ -123,7 +128,7 @@ exports.fn =
                     # emit >>>deepcopy<<< of stack
                     #
 
-                    emitter.emit 'stack', JSON.parse JSON.stringify stack
+                    emitter.emit 'closure', JSON.parse JSON.stringify stack
 
                 stack.pop()
 
@@ -138,7 +143,7 @@ exports.fn =
                 #
                 # end on stackdepth 0
                 #
-                 
+
                 # if stack.length == 0 then emitter.emit 'end' 
 
             else 

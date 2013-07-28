@@ -17,19 +17,19 @@ require('nez').realize 'Js', (Js, test, context, should) ->
             parser.once 'end', -> test done
             parser.parse ''
 
-        it 'emits parsed function definition stack', (done) -> 
+        it 'emits parsed function closure heap', (done) -> 
 
-            parser.once 'stack', (stack) -> 
+            parser.once 'closure', (heap) -> 
 
-                stack[0].signature.should.eql []
-                stack[0].variables.should.eql []
-                stack[0].statements.should.eql ['return function()']
-                stack[0].body.should.eql 'return function() {};'
+                heap[0].signature.should.eql []
+                heap[0].variables.should.eql []
+                heap[0].statements.should.eql ['return function()']
+                heap[0].body.should.eql 'return function() {};'
 
-                stack[1].signature.should.eql []
-                stack[1].variables.should.eql []
-                stack[1].statements.should.eql []
-                stack[1].body.should.eql ''
+                heap[1].signature.should.eql []
+                heap[1].variables.should.eql []
+                heap[1].statements.should.eql []
+                heap[1].body.should.eql ''
                 test done
 
             parser.parse compile '-> ->', bare: true
@@ -37,9 +37,9 @@ require('nez').realize 'Js', (Js, test, context, should) ->
 
         it 'parses function signature', (done) -> 
 
-            parser.once 'stack', (stack) -> 
+            parser.once 'closure', (heap) -> 
 
-                stack[1].signature.should.eql ['arg1', 'arg2']
+                heap[1].signature.should.eql ['arg1', 'arg2']
                 test done
 
             parser.parse compile '(arg1, arg2) ->'
@@ -47,10 +47,10 @@ require('nez').realize 'Js', (Js, test, context, should) ->
 
         it 'parses function variables', (done) -> 
 
-            parser.once 'stack', (stack) -> 
+            parser.once 'closure', (heap) -> 
 
-                stack[1].variables.should.eql ['one', 'three', 'two']
-                stack[2].variables.should.eql ['five']
+                heap[1].variables.should.eql ['one', 'three', 'two']
+                heap[2].variables.should.eql ['five']
                 test done
 
             parser.parse compile """ 
@@ -66,14 +66,14 @@ require('nez').realize 'Js', (Js, test, context, should) ->
 
         it 'parses statements', (done) -> 
 
-            parser.once 'stack', (stack) -> 
+            parser.once 'closure', (heap) -> 
 
-                stack[1].statements.should.eql [
+                heap[1].statements.should.eql [
                     'one = 3'
                     'two = 2'
                     'return three = function(four)'
                 ]
-                stack[2].statements.should.eql [
+                heap[2].statements.should.eql [
                     'return five = 4'
                 ]
                 test done
@@ -89,13 +89,13 @@ require('nez').realize 'Js', (Js, test, context, should) ->
 
             """
 
-        it 'emits the stack at every leaf', (done) -> 
+        it 'emits the closure at every leaf', (done) -> 
 
             parser = fn.parser()
 
             COUNT  = 0
 
-            parser.on 'stack', (stack) -> 
+            parser.on 'closure', (heap) -> 
 
                 COUNT++
 
