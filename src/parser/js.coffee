@@ -6,11 +6,9 @@ exports.fn =
 
         emitter       = new EventEmitter
         stack         = []
-        emitter.parse = parse = (jsString) -> 
+        emitter.parse = recurse = (jsString) -> 
 
             if match = jsString.match /function\s*\((.*)\)\s*{/    
-
-                signature = try match[1].replace(/[\s]/g, '' ).split ','
 
                 fn =
 
@@ -116,7 +114,7 @@ exports.fn =
                     # function body has a nested function, recurse
                     #
 
-                    parse fn.body
+                    recurse fn.body
 
                 else      
 
@@ -135,14 +133,17 @@ exports.fn =
                 #
 
                 remaining = remaining.substring fn.body.length
-                parse remaining
+                recurse remaining
 
                 #
                 # end on stackdepth 0
                 #
-                
-                if stack.length == 0 then emitter.emit 'end' 
+                 
+                # if stack.length == 0 then emitter.emit 'end' 
 
+            else 
+
+                if stack.length == 0 then emitter.emit 'end' 
 
 
         return emitter
