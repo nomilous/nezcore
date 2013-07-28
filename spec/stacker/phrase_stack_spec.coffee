@@ -180,7 +180,7 @@ describe 'PhraseStack', ->
             stacker 'outer phrase', phraseFn
 
 
-        xit 'can be set to only run beforeEach and afterEach hooks upon encountering a leaf node', (done) -> 
+        it 'can be set to only run beforeEach and afterEach hooks upon encountering a leaf node', (done) -> 
 
             
             #

@@ -93,7 +93,7 @@ module.exports =
 
                 for statement in closure.statements
 
-                    if match = statement.match matcher
+                    if statement.match matcher
 
                         #
                         # doneSig() has been called in statement
