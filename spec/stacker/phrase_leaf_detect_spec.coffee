@@ -140,7 +140,28 @@ describe 'PhraseLeafDetect', ->
 
 
 
-            it 'the call to done refers to a variable declared in the nested scope'
+            xit 'the call to done refers to a variable declared in the nested scope', (done) -> 
 
+                PhraseLeafDetect.default
+
+                    phrase: 'phrase'
+                    fn: (done) -> 
+                        nested = -> 
+
+                            #
+                            # done does not appear to be declared as variable
+                            # here (i suspect because it already exists)
+                            # 
+                            # not going to support this unless it specifically
+                            # becomes an issue...
+                            #  
+
+                            done = ->
+                            done()
+
+                    (leaf) -> 
+
+                        leaf.should.equal false
+                        done()
 
 

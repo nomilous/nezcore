@@ -99,27 +99,15 @@ module.exports =
                         # doneSig() has been called in statement
                         #
 
-                        if depth == 1
+                        if declaredDepth == 1
 
                             #
-                            # called as statement in the rootFn, 
-                            # definately a leaf
+                            # doneSig still refers onto the 
+                            # root function's scope
                             # 
 
                             known = true
                             isLeaf true
-
-                        else
-
-                            if declaredDepth == 1
-
-                                #
-                                # doneSig still refers onto the 
-                                # root function's scope
-                                # 
-
-                                known = true
-                                isLeaf true
 
 
         parser.on 'end', -> 
