@@ -45,6 +45,19 @@ describe 'PhraseLeafDetect', ->
                         done()
 
 
+            it 'calls done by some other name', (done) -> 
+
+                PhraseLeafDetect.default
+
+                    phrase: 'phrase'
+                    fn: (goal) -> nested = -> goal()
+
+                    (leaf) -> 
+
+                        leaf.should.equal true
+                        done()
+
+
         context 'is not a leaf if phrase is defined and', -> 
 
             it 'the call to done refers to an arg passed into the nested scope', (done) -> 

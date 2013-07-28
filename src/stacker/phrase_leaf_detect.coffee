@@ -30,19 +30,50 @@ module.exports =
 
     default: (params, isLeaf) -> 
 
-        unless params.phrase? 
+        return isLeaf false unless params.phrase?  
 
-            return isLeaf false
+        #
+        # The parser recurses into the function (and all nested functions)
+        # It emits the closure event, with the heap, whenever it encounters 
+        # a function with no further functions nested within. 
+        # 
+        # This means that the closure event could fire with a heap that 
+        # indicates the presence of a call to arg1 multiple times. 
+        # 
+        # Known is set true upon identifying that as a leaf, to prevent the 
+        # callback to isLeaf being repeated on the same leaf detection run.
+        #
 
         parser = fn.parser()
+        known  = false
+        
 
         parser.on 'closure', (heap) -> 
 
-            console.log heap
+            return if known
+
+            #
+            # doneSig is the first argument >>name<< on the root 
+            # function of the phrase.
+            # 
+            # ie.  stacker 'phrase text', (foo, more, things) -> 
+            #      
+            #      Will need to find an instance of a call to
+            #      foo() without arguments to determine the
+            #      leaffyness of the phrase.
+            # 
+
+            rootFn  = heap[0]
+            doneSig = rootFn.signature[0]
+
+            known = true
+            isLeaf true
 
         parser.on 'end', -> 
 
-            isLeaf true
+            return if known
+            isLeaf false
+
 
         parser.parse params.fn.toString()
 
