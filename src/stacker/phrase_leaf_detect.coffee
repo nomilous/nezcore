@@ -34,14 +34,15 @@ module.exports =
 
         #
         # The parser recurses into the function (and all nested functions)
+        # 
         # It emits the closure event, with the heap, whenever it encounters 
         # a function with no further functions nested within. 
         # 
         # This means that the closure event could fire with a heap that 
         # indicates the presence of a call to arg1 multiple times. 
         # 
-        # Known is set true upon identifying that as a leaf, to prevent the 
-        # callback to isLeaf being repeated on the same leaf detection run.
+        # Known is set true upon identifying a leaf, to prevent the callback 
+        # to isLeaf being repeated on the same leaf detection run.
         #
 
         parser = fn.parser()

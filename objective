@@ -1,17 +1,19 @@
+#!/usr/bin/env bash
+cake dev
+
 #!/usr/bin/env coffee
-
-require('nez').objective 'Nezcore',
-
-    nimbal: 'https://localhost:10101/'
-
-    class: 'Root Module'
-
-    classification: 'Nez Core Componentes'
-
-    description: """
-
-        Base tools, plugins and utilities for nez.
-
-    """, (requirement) -> 
-
-        
+#
+#require('nez').objective 'Nezcore',
+#
+#    nimbal: 'https://localhost:10101/'
+#
+#    class: 'Root Module'
+#
+#    classification: 'Nez Core Componentes'
+#
+#    description: """
+#
+#        Base tools, plugins and utilities for nez.
+#
+#    """, (requirement) -> 
+#
