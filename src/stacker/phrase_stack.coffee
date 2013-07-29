@@ -66,8 +66,8 @@ module.exports =
                     deferral = defer()
 
                              # 
-                             # each deferral resolver passed in
-                             # on the calls to the hooks,
+                             # each deferral resolver is passed 
+                             # in on the call to the hook,
                              # as the done function
                              # 
                              # beforeEach:  (done) -> 
@@ -196,6 +196,7 @@ module.exports =
                         #   therefore will receive no resolve call)
                         #
 
+                        
                         console.log 'TODO: fix parent resolve before child'
 
                         parent = stack[stack.length-1]
