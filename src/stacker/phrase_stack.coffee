@@ -1,5 +1,7 @@
 {argsOf}   = require('also').util
 {async}    = require('also').inject
+{defer}    = require 'when'
+sequence   = require 'when/sequence'
 LeafDetect = require './phrase_leaf_detect' 
 
 #
@@ -21,21 +23,55 @@ module.exports =
 
         context.isLeaf ||= LeafDetect.default
 
-        #
-        # when context.leafOnly == true a hook stack is accumulated
-        # and only executed upon entering and exiting a leaf node
-        #
+        runHooks = (hookType, stack, done) -> 
 
-        hooks = {}
+            #
+            # context.leafOnly was set true
+            # -----------------------------
+            # 
+            # In this mode the beforeEach and afterEach hooks are not run inline 
+            # around each phrase boundry, but instead, upon detecting a leaf, the 
+            # entire stack is traversed to run these hook before and after 
+            # the phrase is executed.
+            #
 
-        pushHook = (hookType, control) -> 
 
-        runHooks = (hookType, control, done) -> 
+            # str = (for phrase in stack
+            #     "[#{phrase.element}] #{phrase.phrase}"
+            # ).join ' '
+            # console.log '\nRUN', hookType, 'for', str
 
-            
-            done()
 
-        popHook = (hookType) -> 
+                    # 
+                    # for loop returns array of functions
+                    # each deferring a call to the hook
+                    # at that phrase
+                    # 
+
+            sequence( for phrase in stack
+
+                do (phrase) -> -> 
+
+                    #
+                    # do() locks each phrase into a closure
+                    # to prevent the for loop having nexted
+                    # all deferrals to refer onto the last 
+                    # phrase in the stack by the time the 
+                    # sequence traversal begins, 
+                    # 
+                    # but still returns the deferred function 
+                    # for the sequence array
+                    #
+
+                    deferral = defer()
+                    phrase[hookType] deferral.resolve
+                    deferral.promise
+
+            ).then done, done
+
+                    #
+                    # done is promise resolve and reject handler
+                    #
 
 
         stacker = (elementName, control) -> 
@@ -86,13 +122,11 @@ module.exports =
                         defer:      inject.defer
                         queue:      inject.queue
                         current:    inject.current
-                        beforeEach: control.beforeEach
-                        afterEach:  control.afterEach
+                        beforeEach: control.beforeEach || (done) -> done()
+                        afterEach:  control.afterEach  || (done) -> done()
                         # fn:         inject.args[2]
 
                     if control.leafOnly 
-
-                        pushHook 'beforeEach', control
 
                         context.isLeaf 
 
@@ -110,15 +144,9 @@ module.exports =
                                     #
 
                                     control.leaf = true
-
-                                    console.log LEAF: 
-                                        element: elementName
-                                        phrase: inject.args[0]
-
-                                    return runHooks 'beforeEach', control, done
+                                    return runHooks 'beforeEach', stack, done
 
                                 done()
-
 
                     else if typeof control.beforeEach == 'function'
 
@@ -151,25 +179,30 @@ module.exports =
                         #   therefore will receive no resolve call)
                         #
 
+                        console.log 'TODO: fix parent resolve before child'
+
                         parent = stack[stack.length-1]
                         parent.defer.resolve() if parent?
 
-                        unless parent?
+                        #
+                        # unless parent?
+                        #     #
+                        #     # at root node, queue empty all done
+                        #     #
+                        #     if context.done? then context.done()
+                        #     done()
+                        # 
 
-                            #
-                            # at root node, queue empty all done
-                            #
+                    if control.leaf 
 
-                            if context.done? then context.done()
-                            done()
+                                                            #
+                                                            # hook run still needs 
+                                                            # last element on stack
+                                                            # 
 
+                        return runHooks 'afterEach', stack.concat( [element] ), done
 
-                    if control.leaf
-
-                        pushHook 'afterEach', control
-                        return runHooks 'afterEach', control, done
-
-                    else if typeof control.afterEach == 'function'
+                    if typeof control.afterEach == 'function'
 
                         return control.afterEach done unless control.global
                         return control.afterEach.call null, done

@@ -1,5 +1,6 @@
-PhraseStack = require '../../lib/stacker/phrase_stack'
-should      = require 'should'
+PhraseStack      = require '../../lib/stacker/phrase_stack'
+PhraseLeafDetect = require('../../lib/stacker/phrase_leaf_detect')
+should           = require 'should'
 
 describe 'PhraseStack', -> 
 
@@ -7,7 +8,7 @@ describe 'PhraseStack', ->
     NOTICE   = {}
     REALIZER = (root, test) -> 
 
-    context 'create()', ->
+    xcontext 'create()', ->
 
         it 'is a function', (done) -> 
 
@@ -20,7 +21,7 @@ describe 'PhraseStack', ->
             stacker.should.be.an.instanceof Function
             done()
 
-    context 'is used to build a phrase stack', -> 
+    xcontext 'is used to build a phrase stack', -> 
 
         it 'exposes the stack and top properties', (done) -> 
 
@@ -97,7 +98,7 @@ describe 'PhraseStack', ->
 
     context 'hooks', -> 
 
-        it 'runs before and after hooks inline', (done) -> 
+        xit 'runs before and after hooks inline', (done) -> 
 
             stacker = PhraseStack.create CONTEXT, NOTICE, REALIZER
 
@@ -128,7 +129,7 @@ describe 'PhraseStack', ->
                 done()
 
 
-        it 'is supports a leafOnly mode that tests for leaf on every phrase', (done) -> 
+        xit 'is supports a leafOnly mode that tests for leaf on every phrase', (done) -> 
 
             COUNT   = 0
             stacker = PhraseStack.create { 
@@ -162,11 +163,13 @@ describe 'PhraseStack', ->
                 COUNT.should.equal 5
                 done()
 
-        it 'uses a default leaf detector', (done) -> 
+        xit 'uses a default leaf detector', (done) -> 
 
             phraseFn = ->
 
-            require('../../lib/stacker/phrase_leaf_detect').default = (params, isLeaf) -> 
+            swap = PhraseLeafDetect.default
+            PhraseLeafDetect.default = (params, isLeaf) -> 
+                PhraseLeafDetect.default = swap
 
                 params.should.eql 
 
@@ -182,27 +185,16 @@ describe 'PhraseStack', ->
 
         it 'can be set to only run beforeEach and afterEach hooks upon encountering a leaf node', (done) -> 
 
-            
-            #
-            # IMPORTANT
             # 
-            # * Set `leafOnly: true` on context to enable only running the accumulated beforeEach
-            #   and afterEach hooks upon encountering a leaf node.
+            # leafOnly repeats nodes ancestrally
             # 
-            # * This will repeat the hooks ancestrally. 
-            # 
-            #   ie. the entire stack of accumulated beforeEach and afterEach hooks runs before
-            #       and after the execution of a leaf node
-            # 
-            # * This does not affect beforeAll and afterAll - these hooks are run before and after
-            #   the subtree they surround at the time the walker arrives and departs the subtree.
-            #
 
             HOOKS = {}
 
             stacker = PhraseStack.create {
 
                 leafOnly: true
+                #timeout: 10
 
             }, NOTICE, REALIZER
 
@@ -210,74 +202,72 @@ describe 'PhraseStack', ->
 
                 beforeEach: (done) -> 
 
-                    console.log 'outer before each'
+                    #console.log 'outer before each'
                     HOOKS[ 'outer before each'] ||= 0
                     HOOKS[ 'outer before each']++
                     done()
 
                 afterEach: (done) -> 
 
-                    console.log 'outer after each'
+                    #console.log 'outer after each'
                     HOOKS[ 'outer after each'] ||= 0
                     HOOKS[ 'outer after each']++
                     done()
 
                 (nested) -> 
 
-                    #setTimeout (-> nested()), 100
-
-                    #nested()
 
                     nested 'LEAF NODE 1', (done) -> 
 
-                        console.log RUN: 'LEAF NODE 1'
-
+                        #console.log RUN: 'LEAF NODE 1'
                         done()
 
-                    # nested 'nested phrase'
+                    nested 'nested phrase',
 
-                    #     beforeEach: (done) -> 
+                        beforeEach: (done) -> 
 
-                    #         console.log 'nested before each'
-                    #         HOOKS[ 'nested before each'] ||= 0
-                    #         HOOKS[ 'nested before each']++
-                    #         done()
+                            # console.log 'nested before each'
+                            HOOKS[ 'nested before each'] ||= 0
+                            HOOKS[ 'nested before each']++
+                            done()
 
-                    #     afterEach: (done) -> 
+                        afterEach: (done) -> 
 
-                    #         console.log 'nested after each'
-                    #         HOOKS[ 'nested after each'] ||= 0
-                    #         HOOKS[ 'nested after each']++
-                    #         done()
+                            # console.log 'nested after each'
+                            HOOKS[ 'nested after each'] ||= 0
+                            HOOKS[ 'nested after each']++
+                            done()
 
-                    #     (deeper) -> 
+                        (deeper) -> 
 
-                    #         deeper 'LEAF NODE 2', (done) -> 
 
-                    #             console.log RUN: 'LEAF NODE 2'
-                    #             done() 
+                            deeper 'LEAF NODE 2', (done) -> 
 
-                    #         deeper 'LEAF NODE 3', (done) -> 
+                                #console.log RUN: 'LEAF NODE 2'
+                                done() 
 
-                    #             console.log RUN: 'LEAF NODE 3'
-                    #             done() 
+                            deeper 'LEAF NODE 3', (done) -> 
+
+                                #console.log RUN: 'LEAF NODE 3'
+                                done() 
 
             .then -> 
 
-                console.log HOOKS
-                HOOKS.should.eql 
+                    console.log HOOKS
+                    HOOKS.should.eql 
 
-                    'outer before each':  3  #  3 leaf nodes exist inside the outer phrase
-                    'nested before each': 2  #  2 leaf nodes exist inside 
-                    'nested after each':  2  #  
-                    'outer after each':   3  # 
+                        'outer before each':  3  #  3 leaf nodes exist inside the outer phrase
+                        'nested before each': 2  #  2 leaf nodes exist inside 
+                        'nested after each':  2  #  
+                        'outer after each':   3  # 
 
-                done()
+                    done()
+
 
 
         xit 'can optionally enforce global scope', (done) -> 
 
-            done 'not'
+            #done 'not'
 
             
             stacker   = PhraseStack.create {     global: true     }, NOTICE, REALIZER
@@ -287,14 +277,14 @@ describe 'PhraseStack', ->
 
             stacker( 'outer phrase', 
 
-                beforeAll:  (done) -> @variable.beforeAll  = ++@count; done()
-                beforeEach: (done) -> @variable.beforeEach = ++@count; done()
-                afterEach:  (done) -> @variable.afterEach  = ++@count; done()
-                afterAll:   (done) -> @variable.afterAll   = ++@count; done()
+                beforeAll:  (done) => @variable.beforeAll  = ++@count; done()
+                beforeEach: (done) => @variable.beforeEach = ++@count; done()
+                afterEach:  (done) => @variable.afterEach  = ++@count; done()
+                afterAll:   (done) => @variable.afterAll   = ++@count; done()
 
-                (nested) -> 
+                (nested) => 
 
-                    nested 'inner phrase', (next) -> 
+                    nested 'inner phrase', (next) => 
 
                         #console.log @variable
 
@@ -305,7 +295,7 @@ describe 'PhraseStack', ->
 
                         next()
                     
-            ).then -> 
+            ).then => 
 
                 #console.log @variable
 
