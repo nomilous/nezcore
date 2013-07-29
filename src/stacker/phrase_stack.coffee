@@ -60,11 +60,21 @@ module.exports =
                     # sequence traversal begins, 
                     # 
                     # but still returns the deferred function 
-                    # for the sequence array
+                    # for the sequence bound function array
                     #
 
                     deferral = defer()
-                    phrase[hookType] deferral.resolve
+
+                             # 
+                             # each deferral resolver passed in
+                             # on the calls to the hooks,
+                             # as the done function
+                             # 
+                             # beforeEach:  (done) -> 
+                             # afterEach:   (done) -> 
+                             # 
+
+                    phrase[hookType]( deferral.resolve )
                     deferral.promise
 
             ).then done, done
@@ -122,9 +132,16 @@ module.exports =
                         defer:      inject.defer
                         queue:      inject.queue
                         current:    inject.current
+                        # fn:         inject.args[2]
+
+                        #
+                        # before and afterEach hooks into the stack
+                        # (default if undefined)
+                        #
+
                         beforeEach: control.beforeEach || (done) -> done()
                         afterEach:  control.afterEach  || (done) -> done()
-                        # fn:         inject.args[2]
+                        
 
                     if control.leafOnly 
 
