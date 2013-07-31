@@ -91,13 +91,13 @@ module.exports =
 
                     console.log error.stack
 
-                onTimeout: (done, detail, context) -> 
+                onTimeout: (done, detail, inject) -> 
 
                     if context.handler?
 
                         if typeof context.handler.onTimeout == 'function'
                     
-                            return context.handler.onTimeout done, detail, context, pushFn
+                            return context.handler.onTimeout done, detail, inject, pushFn
 
                     done()
 
