@@ -176,56 +176,102 @@ module.exports =
 
                 afterEach: (done, inject) -> 
 
-                    if inject.current.timeout
+                    element = undefined
+
+                    sequence([
 
                         #
-                        # pass to tester on element timeout
+                        # did timeout occur (resolver was not called in fn)
                         #
 
-                        pushFn.timeout = true
-                        tester pushFn if typeof tester == 'function'
+                        -> 
 
-                    element = stack.pop()
+                            return unless inject.current.timeout
 
-                    if element.queue.remaining == 0
+                            step = defer()
+                            if inject.current.timeout
+
+                                #
+                                # TODO: tester callback or promise
+                                #
+
+                                pushFn.timeout = true
+                                tester pushFn if typeof tester == 'function'
+                                step.resolve()
+
+
+                            step.promise
 
                         #
-                        # no further unprocessed phrases at the current depth
-                        # 
-                        # * resolve the parent (which is not a leaf node and 
-                        #   therefore will receive no resolve call)
+                        # leafOnly mode, run hooks if leaf
                         #
+
+                        -> 
+
+                            return unless control.leaf
+
+                            step = defer()
+                            runHooks 'afterEach', stack, (result) ->
+
+                                # 
+                                # TODO: handle error in hook
+                                # 
+                                # return action.reject result if result instanceof Error
+                                # cannot reject because entire sequence must run...
+                                # 
+
+                                step.resolve result
+
+                            step.promise
+
+                        #
+                        # pop the stack
+                        #
+
+                        -> 
+
+                            element = stack.pop()
+
+                        #
+                        # run non leafOnly hooks
+                        #
+
+                        -> 
+
+                            return if control.leaf
+                            return unless control.afterEach == 'function' 
+
+                            step = defer()
+                            if control.global
+                                return control.afterEach (result) -> step.resolve result
+                            return control.afterEach.call null, (result) -> step.resolve result
+
+                            step.promise
+
+
+                    ]).then -> 
+
+                        #
+                        # resolve parent if necessary
+                        #
+
+                        done()
+
+                        if element.queue.remaining == 0
+
+                            #
+                            # no further unprocessed phrases at the current depth
+                            # 
+                            # * resolve the parent (which is not a leaf node and 
+                            #   therefore will receive no resolve call)
+                            #
+
+                            console.log 'TODO: fix parent resolve before child'
+
+                            parent = stack[stack.length-1]
+                            parent.defer.resolve() if parent?
 
                         
-                        console.log 'TODO: fix parent resolve before child'
-
-                        parent = stack[stack.length-1]
-                        parent.defer.resolve() if parent?
-
-                        #
-                        # unless parent?
-                        #     #
-                        #     # at root node, queue empty all done
-                        #     #
-                        #     if context.done? then context.done()
-                        #     done()
-                        # 
-
-                    if control.leaf 
-
-                                                            #
-                                                            # hook run still needs 
-                                                            # last element on stack
-                                                            # 
-
-                        return runHooks 'afterEach', stack.concat( [element] ), done
-
-                    if typeof control.afterEach == 'function'
-
-                        return control.afterEach done unless control.global
-                        return control.afterEach.call null, done
-
-                    done()
 
 
                 afterAll: (done, inject) -> 

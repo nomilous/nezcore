@@ -202,14 +202,14 @@ describe 'PhraseStack', ->
 
                 beforeEach: (done) -> 
 
-                    #console.log 'outer before each'
+                    console.log 'outer before each'
                     HOOKS[ 'outer before each'] ||= 0
                     HOOKS[ 'outer before each']++
                     done()
 
                 afterEach: (done) -> 
 
-                    #console.log 'outer after each'
+                    console.log 'outer after each'
                     HOOKS[ 'outer after each'] ||= 0
                     HOOKS[ 'outer after each']++
                     done()
@@ -219,37 +219,36 @@ describe 'PhraseStack', ->
 
                     nested 'LEAF NODE 1', (done) -> 
 
-                        #console.log RUN: 'LEAF NODE 1'
+                        console.log RUN: 'LEAF NODE 1'
                         done()
 
                     nested 'nested phrase',
 
                         beforeEach: (done) -> 
 
-                            # console.log 'nested before each'
+                            console.log 'nested before each'
                             HOOKS[ 'nested before each'] ||= 0
                             HOOKS[ 'nested before each']++
                             done()
 
                         afterEach: (done) -> 
 
-                            # console.log 'nested after each'
+                            console.log 'nested after each'
                             HOOKS[ 'nested after each'] ||= 0
                             HOOKS[ 'nested after each']++
                             done()
 
                         (deeper) -> 
 
-
                             deeper 'LEAF NODE 2', (done) -> 
 
-                                #console.log RUN: 'LEAF NODE 2'
+                                console.log RUN: 'LEAF NODE 2'
                                 done() 
 
-                            deeper 'LEAF NODE 3', (done) -> 
+                    #         deeper 'LEAF NODE 3', (done) -> 
 
-                                #console.log RUN: 'LEAF NODE 3'
-                                done() 
+                    #             console.log RUN: 'LEAF NODE 3'
+                    #             done() 
 
             .then -> 
 
