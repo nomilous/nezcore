@@ -97,7 +97,7 @@ module.exports =
 
                         if typeof context.handler.onTimeout == 'function'
                     
-                            return context.handler.onTimeout done, detail, inject, pushFn
+                            return context.handler.onTimeout done, detail, pushFn
 
                     done()
 
