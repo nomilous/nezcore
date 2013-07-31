@@ -125,7 +125,7 @@ module.exports =
 
                     inject.args[1].defer = inject.defer
 
-                    stack.push
+                    stack.push element = 
 
                         element:    elementName
                         phrase:     inject.args[0]
@@ -156,11 +156,11 @@ module.exports =
                                 if leaf
 
                                     #
-                                    # set leaf so that afterEach does not need
+                                    # flag element as leaf so that afterEach does not need
                                     # to perform the same investigation
                                     #
 
-                                    control.leaf = true
+                                    element.leaf = true
                                     return runHooks 'beforeEach', stack, done
 
                                 done()
@@ -176,7 +176,7 @@ module.exports =
 
                 afterEach: (done, inject) -> 
 
-                    element = undefined
+                    element = stack[stack.length - 1]
 
                     sequence([
 
@@ -187,7 +187,6 @@ module.exports =
                         -> 
 
                             return unless inject.current.timeout
-
                             step = defer()
                             if inject.current.timeout
 
@@ -208,10 +207,16 @@ module.exports =
 
                         -> 
 
-                            return unless control.leaf
-
+                            return unless element.leaf
                             step = defer()
-                            runHooks 'afterEach', stack, (result) ->
+
+                            #
+                            # afterEach hooks run in reversed stack order
+                            # 
+
+                            reversed = []
+                            reversed.unshift phrase for phrase in stack
+                            runHooks 'afterEach', reversed, (result) ->
 
                                 # 
                                 # TODO: handle error in hook
@@ -230,7 +235,7 @@ module.exports =
 
                         -> 
 
-                            element = stack.pop()
+                            stack.pop()
 
                         #
                         # run non leafOnly hooks
@@ -238,8 +243,9 @@ module.exports =
 
                         -> 
 
-                            return if control.leaf
-                            return unless control.afterEach == 'function' 
+                            return if control.leafOnly
+                            return if element.leaf
+                            return unless typeof control.afterEach == 'function'
 
                             step = defer()
                             if control.global
@@ -251,27 +257,28 @@ module.exports =
 
                     ]).then -> 
 
-                        #
-                        # resolve parent if necessary
-                        #
-
                         done()
+
+                        #
+                        # resolve parent if necessary 
+                        # 
 
                         if element.queue.remaining == 0
 
-                            #
-                            # no further unprocessed phrases at the current depth
-                            # 
-                            # * resolve the parent (which is not a leaf node and 
-                            #   therefore will receive no resolve call)
-                            #
+                            process.nextTick ->
 
-                            console.log 'TODO: fix parent resolve before child'
+                                #
+                                # no further unprocessed phrases at the current depth
+                                # 
+                                # * resolve the parent (which is not a leaf node and 
+                                #   therefore will receive no resolve call)
+                                #
 
-                            parent = stack[stack.length-1]
-                            parent.defer.resolve() if parent?
+                                parent = stack[stack.length-1]
+                                parent.defer.resolve() if parent?
 
-                        
+
+
 
 
                 afterAll: (done, inject) -> 

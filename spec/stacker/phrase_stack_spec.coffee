@@ -8,7 +8,7 @@ describe 'PhraseStack', ->
     NOTICE   = {}
     REALIZER = (root, test) -> 
 
-    xcontext 'create()', ->
+    context 'create()', ->
 
         it 'is a function', (done) -> 
 
@@ -21,7 +21,7 @@ describe 'PhraseStack', ->
             stacker.should.be.an.instanceof Function
             done()
 
-    xcontext 'is used to build a phrase stack', -> 
+    context 'is used to build a phrase stack', -> 
 
         it 'exposes the stack and top properties', (done) -> 
 
@@ -98,7 +98,7 @@ describe 'PhraseStack', ->
 
     context 'hooks', -> 
 
-        xit 'runs before and after hooks inline', (done) -> 
+        it 'runs before and after hooks inline', (done) -> 
 
             stacker = PhraseStack.create CONTEXT, NOTICE, REALIZER
 
@@ -115,21 +115,24 @@ describe 'PhraseStack', ->
 
                     nested 'inner phrase 1', (end) -> 
 
+                        #console.log ONE: HOOKS
                         HOOKS.should.eql ['BEFORE ALL', 'BEFORE EACH']
                         end()
 
                     nested 'inner phrase 2', (end) -> 
 
+                        #console.log TWO: HOOKS
                         HOOKS.should.eql ['BEFORE ALL', 'BEFORE EACH', 'AFTER EACH', 'BEFORE EACH' ]
                         end()
 
             ).then -> 
 
+
                 HOOKS.should.eql ['BEFORE ALL', 'BEFORE EACH', 'AFTER EACH', 'BEFORE EACH', 'AFTER EACH', 'AFTER ALL']
                 done()
 
 
-        xit 'is supports a leafOnly mode that tests for leaf on every phrase', (done) -> 
+        it 'is supports a leafOnly mode that tests for leaf on every phrase', (done) -> 
 
             COUNT   = 0
             stacker = PhraseStack.create { 
@@ -163,7 +166,7 @@ describe 'PhraseStack', ->
                 COUNT.should.equal 5
                 done()
 
-        xit 'uses a default leaf detector', (done) -> 
+        it 'uses a default leaf detector', (done) -> 
 
             phraseFn = ->
 
@@ -202,14 +205,14 @@ describe 'PhraseStack', ->
 
                 beforeEach: (done) -> 
 
-                    console.log 'outer before each'
+                    #console.log 'outer before each'
                     HOOKS[ 'outer before each'] ||= 0
                     HOOKS[ 'outer before each']++
                     done()
 
                 afterEach: (done) -> 
 
-                    console.log 'outer after each'
+                    #console.log 'outer after each'
                     HOOKS[ 'outer after each'] ||= 0
                     HOOKS[ 'outer after each']++
                     done()
@@ -219,21 +222,21 @@ describe 'PhraseStack', ->
 
                     nested 'LEAF NODE 1', (done) -> 
 
-                        console.log RUN: 'LEAF NODE 1'
+                        #console.log RUN: 'LEAF NODE 1'
                         done()
 
                     nested 'nested phrase',
 
                         beforeEach: (done) -> 
 
-                            console.log 'nested before each'
+                            #console.log 'nested before each'
                             HOOKS[ 'nested before each'] ||= 0
                             HOOKS[ 'nested before each']++
                             done()
 
                         afterEach: (done) -> 
 
-                            console.log 'nested after each'
+                            #console.log 'nested after each'
                             HOOKS[ 'nested after each'] ||= 0
                             HOOKS[ 'nested after each']++
                             done()
@@ -242,17 +245,17 @@ describe 'PhraseStack', ->
 
                             deeper 'LEAF NODE 2', (done) -> 
 
-                                console.log RUN: 'LEAF NODE 2'
+                                #console.log RUN: 'LEAF NODE 2'
                                 done() 
 
-                    #         deeper 'LEAF NODE 3', (done) -> 
+                            deeper 'LEAF NODE 3', (done) -> 
 
-                    #             console.log RUN: 'LEAF NODE 3'
-                    #             done() 
+                                #console.log RUN: 'LEAF NODE 3'
+                                done() 
 
             .then -> 
 
-                    console.log HOOKS
+                    #console.log HOOKS
                     HOOKS.should.eql 
 
                         'outer before each':  3  #  3 leaf nodes exist inside the outer phrase
