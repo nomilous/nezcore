@@ -267,11 +267,8 @@ describe 'PhraseStack', ->
 
 
 
-        xit 'can optionally enforce global scope', (done) -> 
+        it 'can optionally enforce global scope', (done) -> 
 
-            #done 'not'
-
-            
             stacker   = PhraseStack.create {     global: true     }, NOTICE, REALIZER
 
             @variable = {}
@@ -289,7 +286,6 @@ describe 'PhraseStack', ->
                     nested 'inner phrase', (next) => 
 
                         #console.log @variable
-
                         @variable.should.eql 
 
                             beforeAll:  1
@@ -300,7 +296,6 @@ describe 'PhraseStack', ->
             ).then => 
 
                 #console.log @variable
-
                 @variable.should.eql
 
                     beforeAll:  1

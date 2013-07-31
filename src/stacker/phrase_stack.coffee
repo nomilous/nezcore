@@ -13,11 +13,7 @@ LeafDetect = require './phrase_leaf_detect'
 
 module.exports = 
 
-    create: (context, notice, realizerFn, tester) -> 
-
-                                            #
-                                            # TODO: tester not appropriate here
-                                            #
+    create: (context, notice, realizerFn) -> 
 
         stack   = []
 
@@ -91,9 +87,19 @@ module.exports =
                 parallel: false
                 timeout: control.timeout || 0
 
-                error: (error) -> 
+                onError: (error) -> 
 
                     console.log error.stack
+
+                onTimeout: (done, detail, context) -> 
+
+                    if context.handler?
+
+                        if typeof context.handler.onTimeout == 'function'
+                    
+                            return context.handler.onTimeout done, detail, context, pushFn
+
+                    done()
 
                 beforeAll: (done) -> 
 
@@ -181,27 +187,6 @@ module.exports =
                     sequence([
 
                         #
-                        # did timeout occur (resolver was not called in fn)
-                        #
-
-                        -> 
-
-                            return unless inject.current.timeout
-                            step = defer()
-                            if inject.current.timeout
-
-                                #
-                                # TODO: tester callback or promise
-                                #
-
-                                pushFn.timeout = true
-                                tester pushFn if typeof tester == 'function'
-                                step.resolve()
-
-
-                            step.promise
-
-                        #
                         # leafOnly mode, run hooks if leaf
                         #
 
@@ -244,7 +229,7 @@ module.exports =
                         -> 
 
                             return if control.leafOnly
-                            return if element.leaf
+                            #return if element.leaf
                             return unless typeof control.afterEach == 'function'
 
                             step = defer()
