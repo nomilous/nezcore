@@ -57,6 +57,21 @@ describe 'PhraseHook', ->
 
             done()
 
+        it 'preserves already defined control.beforeAll', (done) -> 
+
+            before all: -> throw 'SHOULD NOT RUN'
+
+            hook = PhraseHook.beforeAll OPTS, 
+
+                #
+                # control alreaty has beforeAll defined
+                #
+
+                beforeAll: -> done()
+
+            hook ->
+
+
         it 'running the function calls the assigned beforeAll hook', (done) -> 
 
             before all: -> done()
@@ -64,7 +79,21 @@ describe 'PhraseHook', ->
             hook ->
 
 
-        it 'running the function with control.global as true resets self to global', (done) -> 
+        it 'running the function preserves scope into the call to beforeAll', (done) -> 
+
+            obj = new Object property: 'VALUE'
+
+            before all: -> 
+
+                @property.should.equal 'VALUE'
+                done()
+
+            hook = PhraseHook.beforeAll OPTS, {}
+
+            hook.call obj, ->
+
+
+        it 'running the function with control.global as true runs beforeAll on the global scope', (done) -> 
 
             obj = new Object property: 'VALUE'
 
@@ -74,22 +103,25 @@ describe 'PhraseHook', ->
                 # `this` is now obj
                 #
 
-                @.property.should.equal 'VALUE'
+                @property.should.equal 'VALUE'
 
-                hook = PhraseHook.beforeAll global: true, {}
+                hook = PhraseHook.beforeAll global: true, 
+
+                    beforeAll: -> 
+
+                        #
+                        # `this` was reset to global
+                        #
+
+                        @process.title.should.equal 'node'
+                        should.not.exist @property
+                        done()
+
                 hook ->
-
-                    #
-                    # `this` was reset to global
-                    #
-
-                    @.process.title.should.equal 'node'
-                    done()
 
             #
             # call fn on obj
             #
 
             fn.call obj
-
 

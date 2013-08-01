@@ -23,15 +23,20 @@ module.exports =
 
     beforeAll: (opts, control) -> 
 
-        (done, inject) -> 
+        #
+        # return a function to handle calls to beforeAll
+        # on the phrase stack's async injector loop
+        #
+
+        return (done, inject) -> 
 
             #
             # assign registered hooks
             #
 
             beforeEach = beforeHooks.each.pop()
-            beforeAll  = beforeHooks.all.pop() 
-            afterEach  = afterHooks.each.pop() 
+            beforeAll  = beforeHooks.all.pop()
+            afterEach  = afterHooks.each.pop()
             afterAll   = afterHooks.all.pop()
 
             control.beforeEach ||= beforeEach
@@ -41,7 +46,7 @@ module.exports =
 
             if typeof control.beforeAll == 'function'
 
-                return control.beforeAll done unless opts.global
+                return control.beforeAll.call this, done unless opts.global
                 return control.beforeAll.call null, done
 
             done()
