@@ -62,17 +62,25 @@ module.exports =
 
             unless typeof inject.args[2] == 'function'
 
+                argCount = inject.args.length
+
                 inject.args[2] = inject.args[1] || -> 
 
-                    #
-                    # call to stacker with no args
-                    # ----------------------------
-                    # 
-                    # * pop stack and resolve parent's injection promise
-                    # 
+                    if argCount == 0
 
-                    opts.stack.pop()
-                    control.defer.resolve()
+                        #
+                        # call to stacker with no args
+                        # ----------------------------
+                        # 
+                        # * pop stack and resolve parent's injection promise
+                        # 
+
+                        opts.stack.pop()
+                        control.defer.resolve()
+
+                if argCount == 1
+
+                    console.log "TODO: something useful at phrase: '#{inject.args[0]}'"
                 
                 #
                 # default arg2 as empty control hash

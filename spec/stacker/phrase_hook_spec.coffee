@@ -204,7 +204,7 @@ describe 'PhraseHook', ->
             ), inject
 
 
-        it 'default arg3 to resolve the parent and pop the stack, if no args', (done) -> 
+        xit 'default arg3 to resolve the parent and pop the stack, if no args', (done) -> 
 
             #
             #   phrase 'phrase text', (done) -> 
@@ -245,6 +245,13 @@ describe 'PhraseHook', ->
                 inject.args[2]()
 
             ), inject
+
+
+        it 'does something useful when called with one arg', (done) -> 
+
+            inject = args: [ 'phrase text' ]
+            hook = PhraseHook.beforeEach OPTS, {}
+            hook done, inject
 
 
 
