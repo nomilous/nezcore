@@ -257,7 +257,7 @@ describe 'PhraseHook', ->
             hook done, inject
 
 
-        it 'pushes the stack', (done) -> 
+        xit 'pushes the stack', (done) -> 
 
             OPTS.stack = []
             OPTS.elementName = 'it'
@@ -287,6 +287,50 @@ describe 'PhraseHook', ->
                     afterEach:  afterE
 
                 ]
+                done()
+
+            ), inject
+
+
+        it 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
+
+            OPTS.stack = []
+            OPTS.elementName = 'it'
+            OPTS.context = leafOnly: true
+            inject = args: [ 
+
+                'does something', (done) -> 
+
+                    #
+                    # this function is sampled as a potential leaf node
+                    #
+
+                            #
+                    done()  # and this would make it one
+                            # 
+            
+            ]
+
+            hook = PhraseHook.beforeEach OPTS, {}
+
+            OPTS.context.isLeaf = (params, isLeaf) -> 
+
+                params.should.eql 
+
+                    element: 'it'
+                    phrase: 'does something'
+                    fn: inject.args[2]
+
+                #
+                # make it a leaf
+                #
+
+                isLeaf true
+            
+
+            hook (->
+
+                OPTS.stack[0].leaf.should.equal true
                 done()
 
             ), inject

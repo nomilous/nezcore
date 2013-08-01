@@ -109,6 +109,26 @@ module.exports =
                 afterEach:  control.afterEach  || (done) -> done()
 
 
+            if opts.context.leafOnly
+
+                opts.context.isLeaf 
+
+                    element: opts.elementName
+                    phrase: inject.args[0]
+                    fn: inject.args[2]
+
+                    (leaf) ->
+
+                        if leaf
+
+                            #
+                            # flag element as leaf so that afterEach does not need
+                            # to perform the same investigation
+                            #
+
+                            element.leaf = true
+
+
             done()
 
 
