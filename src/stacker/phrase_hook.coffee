@@ -41,7 +41,7 @@ module.exports =
 
             if typeof control.beforeAll == 'function'
 
-                return control.beforeAll done unless control.global
+                return control.beforeAll done unless opts.global
                 return control.beforeAll.call null, done
 
             done()

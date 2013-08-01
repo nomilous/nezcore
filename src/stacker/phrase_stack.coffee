@@ -278,7 +278,7 @@ module.exports =
                     #
 
                     childElementName = argsOf( fn )[0]
-                    nestedControl.global = control.global
+                    # nestedControl.global = control.global
                     nestedControl.leafOnly = control.leafOnly
                     fn stacker childElementName, nestedControl
 
