@@ -52,6 +52,47 @@ module.exports =
             done()
 
 
+    beforeEach: (opts, control) -> 
+
+        return (done, inject) -> 
+
+            #
+            # ensure injection of (phrase, control, fn)
+            #
+
+            unless typeof inject.args[2] == 'function'
+
+                inject.args[2] = inject.args[1] || -> 
+
+                    #
+                    # call to stacker with no args
+                    # ----------------------------
+                    # 
+                    # * pop stack and resolve parent's injection promise
+                    # 
+
+                    opts.stack.pop()
+                    control.defer.resolve()
+                
+                #
+                # default arg2 as empty control hash
+                #
+
+                inject.args[1] = {}
+
+            #
+            # attach this injection promise to control hash
+            #
+
+            inject.args[1].defer = inject.defer
+
+
+
+            done()
+
+
+
+
     afterAll: (opts, control) -> 
 
         return (done, inject) -> 

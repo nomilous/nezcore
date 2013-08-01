@@ -5,16 +5,20 @@ should           = require 'should'
 
 describe 'PhraseHook', -> 
 
-    OPTS = {}
+    OPTS = undefined
 
-    it 'creates before() and after() hook registers', (done) -> 
+    beforeEach ->
+
+        OPTS = {}
+
+    xit 'creates before() and after() hook registers', (done) -> 
 
         before.toString().should.match /beforeHooks.each/
         after.toString().should.match /afterHooks.each/
         done()
 
 
-    context 'beforeAll()', -> 
+    xcontext 'beforeAll()', -> 
 
         it 'returns a function', (done) -> 
 
@@ -133,7 +137,119 @@ describe 'PhraseHook', ->
             fn.call obj
 
 
-    context 'afterAll()', -> 
+    context 'beforeEach()', -> 
+
+        xit 'returns a function that prepares the async injection', (done) -> 
+
+            control = defer: "parent's async injection promise"
+
+            hook = PhraseHook.beforeEach OPTS, control
+
+            #
+            # also.inject.async injection context is passed as arg2 to the
+            # hook handler
+            #
+
+            inject = 
+
+                args: [
+
+                    'phrase text'
+
+                    (nested) -> 
+
+                        #
+                        # function that would contain child phrases
+                        # 
+
+                        'NESTED'  
+
+                ]
+
+                defer: "this phrase's async injection promise"
+
+            hook (->
+
+                #
+                # it ensures injection args
+                # -------------------------
+                # 
+                # 1. phrase text
+                # 
+                # 
+
+
+                inject.args[0].should.equal 'phrase text'
+
+                #
+                # 2. config hash (defaulted if not present)
+                # 
+                #    * attached this injections promise to the 
+                #      nestedControl object that is used to 
+                #      create the child phrases of this phrase
+                # 
+
+                inject.args[1].should.eql defer: "this phrase's async injection promise"
+
+                #
+                # 3. function
+                #
+                #    * the function (as passed), that contains all child phrases
+                # 
+
+                inject.args[2].should.be.an.instanceof Function
+                inject.args[2]().should.equal 'NESTED'
+                done()
+
+            ), inject
+
+
+        it 'default arg3 to resolve the parent and pop the stack, if no args', (done) -> 
+
+            #
+            #   phrase 'phrase text', (done) -> 
+            #               
+            #               # 
+            #       done()  # no args, resolves the parent's injection promise
+            #               #          which leads to the processing of the 
+            #               #          next phrase
+            #               # 
+            # 
+            #   phrase 'next phrase text', (nested) -> 
+            # 
+            #       nested '...', (done) ->
+            #
+
+            POPPED     = false
+            OPTS.stack = pop: -> POPPED = true
+            control    = defer: resolve: -> 
+
+                #
+                # parent's injection promise is resolved
+                # and stack is popped
+                #
+
+                POPPED.should.equal true
+                done()
+
+
+            inject  = args: []
+            hook    = PhraseHook.beforeEach OPTS, control
+
+            hook (-> 
+
+                #
+                # make the call to arg3 `done()`
+                # 
+
+                inject.args[2]()
+
+            ), inject
+
+
+
+
+    xcontext 'afterAll()', -> 
 
         it 'returns a function that runs the registred afterall hook', (done) -> 
 
