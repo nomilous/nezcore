@@ -298,10 +298,17 @@ module.exports =
                                 #
 
                                 parent = stack[stack.length-1]
-                                parent.defer.resolve() if parent?
+                                if parent?
 
+                                    parent.defer.resolve()
 
+                                else
 
+                                    #
+                                    # no parent, master resolve
+                                    #
+
+                                    context.done() if typeof context.done =='function'
 
 
                 afterAll: (done, inject) -> 
