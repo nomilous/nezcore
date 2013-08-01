@@ -1,8 +1,9 @@
-{argsOf}   = require('also').util
-{async}    = require('also').inject
-{defer}    = require 'when'
-sequence   = require 'when/sequence'
-LeafDetect = require './phrase_leaf_detect' 
+{argsOf}         = require('also').util
+{async}          = require('also').inject
+{defer}          = require 'when'
+sequence         = require 'when/sequence'
+PhraseLeafDetect = require './phrase_leaf_detect'
+PhraseHook       = require './phrase_hook'
 
 #
 # PhraseStack 
@@ -11,37 +12,13 @@ LeafDetect = require './phrase_leaf_detect'
 # TODO: ???????????
 # 
 
-
-#
-# create before() and after() for hook registration
-#
-
-beforeHooks = each: [], all: []
-afterHooks  = each: [], all: []
-
-if typeof Object.prototype.before == 'undefined'
-    Object.defineProperty Object.prototype, 'before',
-        enumerable: false
-        get: -> (opts = {}) -> 
-            beforeHooks.each.push opts.each if typeof opts.each == 'function'
-            beforeHooks.all.push  opts.all  if typeof opts.all  == 'function'
-   
-
-if typeof Object.prototype.after == 'undefined'
-    Object.defineProperty Object.prototype, 'after',
-        enumerable: false
-        get: -> (opts) -> 
-            afterHooks.each.push opts.each if typeof opts.each == 'function'
-            afterHooks.all.push  opts.all  if typeof opts.all  == 'function'
-
-
 module.exports = 
 
     create: (context, notice, realizerFn) -> 
 
         stack   = []
 
-        context.isLeaf ||= LeafDetect.default
+        context.isLeaf ||= PhraseLeafDetect.default
 
         runHooks = (hookType, stack, done) -> 
 
@@ -54,12 +31,6 @@ module.exports =
             # entire stack is traversed to run these hook before and after 
             # the phrase is executed.
             #
-
-
-            # str = (for phrase in stack
-            #     "[#{phrase.element}] #{phrase.phrase}"
-            # ).join ' '
-            # console.log '\nRUN', hookType, 'for', str
 
 
                     # 
@@ -125,28 +96,8 @@ module.exports =
 
                     done()
 
-                beforeAll: (done) -> 
 
-                    #
-                    # assign registered hooks
-                    #
-
-                    beforeEach = beforeHooks.each.pop()
-                    beforeAll  = beforeHooks.all.pop() 
-                    afterEach  = afterHooks.each.pop() 
-                    afterAll   = afterHooks.all.pop()
-
-                    control.beforeEach ||= beforeEach
-                    control.beforeAll  ||= beforeAll
-                    control.afterEach  ||= afterEach
-                    control.afterAll   ||= afterAll
-
-                    if typeof control.beforeAll == 'function'
-
-                        return control.beforeAll done unless control.global
-                        return control.beforeAll.call null, done
-
-                    done()
+                beforeAll: PhraseHook.beforeAll {}, control
 
                 beforeEach: (done, inject) -> 
 
