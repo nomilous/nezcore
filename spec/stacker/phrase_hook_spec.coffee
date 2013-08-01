@@ -278,8 +278,8 @@ describe 'PhraseHook', ->
             hook (->
 
                 OPTS.stack.should.eql [
-                    element:    'it'
-                    phrase:     'does something'
+                    element:    'fridge'
+                    phrase:     'is cold enough'
                     defer:      'DEFERRAL'
                     queue:      'QUEUE'
                     current:    'CURRENT'
@@ -295,11 +295,11 @@ describe 'PhraseHook', ->
         it 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
 
             OPTS.stack = []
-            OPTS.elementName = 'it'
+            OPTS.elementName = 'can'
             OPTS.context = leafOnly: true
             inject = args: [ 
 
-                'does something', (done) -> 
+                'arrange flowers', (done) -> 
 
                     #
                     # this function is sampled as a potential leaf node
@@ -317,8 +317,8 @@ describe 'PhraseHook', ->
 
                 params.should.eql 
 
-                    element: 'it'
-                    phrase: 'does something'
+                    element: 'can'
+                    phrase: 'arrange flowers'
                     fn: inject.args[2]
 
                 #
