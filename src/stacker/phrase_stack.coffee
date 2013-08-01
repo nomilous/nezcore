@@ -11,6 +11,17 @@ LeafDetect = require './phrase_leaf_detect'
 # TODO: ???????????
 # 
 
+if typeof Object.prototype.before == 'undefined'
+    Object.defineProperty Object.prototype, 'before',
+        get: -> (opts) -> console.log opts
+        enumerable: false
+
+if typeof Object.prototype.after == 'undefined'
+    Object.defineProperty Object.prototype, 'after',
+        get: -> (opts) -> console.log opts
+        enumerable: false
+
+
 module.exports = 
 
     create: (context, notice, realizerFn) -> 
@@ -299,7 +310,6 @@ module.exports =
 
 
             return pushFn
-                    
 
         #
         # return root element named from arg1 of the realizerFn
