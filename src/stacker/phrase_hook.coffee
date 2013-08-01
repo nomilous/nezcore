@@ -80,7 +80,11 @@ module.exports =
 
                 if argCount == 1
 
-                    console.log "TODO: something useful at phrase: '#{inject.args[0]}'"
+                    # 
+                    # console.log "TODO: something useful at phrase: '#{inject.args[0]}'"
+                    # 
+
+                    'noop'
                 
                 #
                 # default arg2 as empty control hash
@@ -94,6 +98,15 @@ module.exports =
 
             inject.args[1].defer = inject.defer
 
+            opts.stack.push element = 
+
+                element:    opts.elementName
+                phrase:     inject.args[0]
+                defer:      inject.defer
+                queue:      inject.queue
+                current:    inject.current
+                beforeEach: control.beforeEach || (done) -> done()
+                afterEach:  control.afterEach  || (done) -> done()
 
 
             done()

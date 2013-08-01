@@ -9,7 +9,8 @@ describe 'PhraseHook', ->
 
     beforeEach ->
 
-        OPTS = {}
+        OPTS = 
+            stack: []
 
     xit 'creates before() and after() hook registers', (done) -> 
 
@@ -221,7 +222,9 @@ describe 'PhraseHook', ->
             #
 
             POPPED     = false
-            OPTS.stack = pop: -> POPPED = true
+            OPTS.stack = 
+                push: -> 
+                pop: -> POPPED = true
             control    = defer: resolve: -> 
 
                 #
@@ -247,11 +250,47 @@ describe 'PhraseHook', ->
             ), inject
 
 
-        it 'does something useful when called with one arg', (done) -> 
+        xit 'does something useful when called with one arg', (done) -> 
 
             inject = args: [ 'phrase text' ]
             hook = PhraseHook.beforeEach OPTS, {}
             hook done, inject
+
+
+        it 'pushes the stack', (done) -> 
+
+            OPTS.stack = []
+            OPTS.elementName = 'it'
+            beforeE = ->
+            afterE = ->
+
+            inject = 
+                args: [ 'does something', -> ]
+                defer:   'DEFERRAL'
+                queue:   'QUEUE'
+                current: 'CURRENT'
+
+            hook = PhraseHook.beforeEach OPTS, 
+
+                beforeEach: beforeE
+                afterEach: afterE
+
+            hook (->
+
+                OPTS.stack.should.eql [
+                    element:    'it'
+                    phrase:     'does something'
+                    defer:      'DEFERRAL'
+                    queue:      'QUEUE'
+                    current:    'CURRENT'
+                    beforeEach: beforeE
+                    afterEach:  afterE
+
+                ]
+                done()
+
+            ), inject
+
 
 
 
