@@ -51,3 +51,16 @@ module.exports =
 
             done()
 
+
+    afterAll: (opts, control) -> 
+
+        return (done, inject) -> 
+
+            if typeof control.afterAll == 'function'
+
+                return control.afterAll.call this, done unless control.global
+                return control.afterAll.call null, done
+
+            done()
+
+

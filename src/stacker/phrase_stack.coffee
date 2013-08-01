@@ -98,6 +98,7 @@ module.exports =
 
 
                 beforeAll: PhraseHook.beforeAll {}, control
+                afterAll:  PhraseHook.afterAll {}, control
 
                 beforeEach: (done, inject) -> 
 
@@ -261,15 +262,6 @@ module.exports =
 
                                     context.done() if typeof context.done =='function'
 
-
-                afterAll: (done, inject) -> 
-
-                    if typeof control.afterAll == 'function'
-
-                        return control.afterAll done unless control.global
-                        return control.afterAll.call null, done
-
-                    done()
 
                 (phrase, nestedControl, fn) -> 
 

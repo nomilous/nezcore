@@ -5,6 +5,8 @@ should           = require 'should'
 
 describe 'PhraseHook', -> 
 
+    OPTS = {}
+
     it 'creates before() and after() hook registers', (done) -> 
 
         before.toString().should.match /beforeHooks.each/
@@ -14,12 +16,17 @@ describe 'PhraseHook', ->
 
     context 'beforeAll()', -> 
 
-        OPTS = {}
-
         it 'returns a function', (done) -> 
 
             PhraseHook.beforeAll().should.be.an.instanceof Function
             done()
+
+        it 'returns a function that runs the registred beforeall hook', (done) -> 
+
+            before all: -> done()
+            hook = PhraseHook.beforeAll OPTS, {}
+            hook ->
+
 
         it 'running the function calls the resolver', (done) -> 
 
@@ -124,4 +131,17 @@ describe 'PhraseHook', ->
             #
 
             fn.call obj
+
+
+    context 'afterAll()', -> 
+
+        it 'returns a function that runs the registred afterall hook', (done) -> 
+
+            hook = PhraseHook.afterAll OPTS, afterAll: -> done()
+            hook -> 
+
+        it 'runs the resolver', (done) -> 
+
+            hook = PhraseHook.afterAll OPTS, {}
+            hook done
 
