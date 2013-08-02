@@ -610,7 +610,7 @@ describe 'PhraseInjector', ->
             obj.hook (->), args: []
 
 
-        it 'does not resolve the parent phrase if unprocessed nodes exist on the current phrase', (done) ->
+        it 'does not resolve the parent phrase if unprocessed nodes (peers) exist on the current phrase', (done) ->
 
             RAN = false
             parentPhrase  = defer: resolve: -> RAN = true
@@ -631,7 +631,7 @@ describe 'PhraseInjector', ->
                 ), 10
 
 
-        it 'resolves the parent phrase if no unprocessed nodes exist on the current phrase', (done) ->
+        it 'resolves the parent phrase if no unprocessed nodes (peers) exist on the current phrase', (done) ->
 
             RAN = false
             parentPhrase  = defer: resolve: -> RAN = true
@@ -645,7 +645,22 @@ describe 'PhraseInjector', ->
 
             ), 10
         
-        
+
+        it 'resolves the master promise if current phrase is the root and has no further unprocessed peers', (done) -> 
+
+            rootPhrase = queue: remaining: 0
+            OPTS.stack = [rootPhrase]
+            OPTS.context.done = -> 
+
+                #
+                # master promise is resolved
+                #
+
+                done()
+
+            PhraseInjector.afterEach( OPTS, {} ) ->
+
+
 
 
     xcontext 'afterAll()', -> 

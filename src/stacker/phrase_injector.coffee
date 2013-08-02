@@ -269,14 +269,20 @@ module.exports = injector =
                     if element? and element.queue.remaining == 0
 
                         #
-                        # no further phrases queued to run at this stack depth
-                        # ----------------------------------------------------
+                        # no further phrases (peer) queued to run at this stack depth
+                        # -----------------------------------------------------------
                         # 
                         # * resolve the parent
                         #
 
                         parent = opts.stack[ opts.stack.length - 1 ]
                         return parent.defer.resolve() if parent?
+
+                        #
+                        # * this is the root phrase, resolve master promise
+                        #
+
+                        opts.context.done() if typeof opts.context.done =='function'
                     
 
 
