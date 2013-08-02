@@ -161,8 +161,8 @@ module.exports =
 
 
             #
-            # expose stack via prperty injectionFunction
-            # ------------------------------------------
+            # expose stack via property of injectionFunction
+            # ----------------------------------------------
             # 
             #     stacker = PhraseStack.create CONFIG, NOTIFIER, (element) -> 
             # 
