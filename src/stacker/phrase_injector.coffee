@@ -269,8 +269,8 @@ module.exports = injector =
                     if element? and element.queue.remaining == 0
 
                         #
-                        # no further phrases (peer) queued to run at this stack depth
-                        # -----------------------------------------------------------
+                        # no further phrases (peers) queued to run at this stack depth
+                        # ------------------------------------------------------------
                         # 
                         # * resolve the parent
                         #

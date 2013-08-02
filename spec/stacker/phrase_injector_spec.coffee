@@ -13,13 +13,13 @@ describe 'PhraseInjector', ->
             stack: []
             context: {}
 
-    xit 'creates before() and after() hook registers', (done) -> 
+    it 'creates before() and after() hook registers', (done) -> 
 
         before.toString().should.match /beforeHooks.each/
         after.toString().should.match /afterHooks.each/
         done()
 
-    xcontext 'runHooks()', -> 
+    context 'runHooks()', -> 
 
         it 'calls the resolver at arg2', (done) -> 
 
@@ -40,7 +40,7 @@ describe 'PhraseInjector', ->
                 done()
 
 
-    xcontext 'beforeAll()', -> 
+    context 'beforeAll()', -> 
 
         it 'returns a function', (done) -> 
 
@@ -159,7 +159,7 @@ describe 'PhraseInjector', ->
             fn.call obj
 
 
-    xcontext 'beforeEach()', -> 
+    context 'beforeEach()', -> 
 
         it 'returns a function that prepares the async injection', (done) -> 
 
@@ -456,7 +456,7 @@ describe 'PhraseInjector', ->
 
     context 'afterEach()', -> 
 
-        xit 'returns a function that calls the resolver', (done) -> 
+        it 'returns a function that calls the resolver', (done) -> 
 
             OPTS.stack = []
             hook = PhraseInjector.afterEach OPTS, {}
@@ -465,11 +465,11 @@ describe 'PhraseInjector', ->
             ), {}
 
 
-        xit 'does not call runHooks if top element in stack is not leaf', (done) -> 
+        it 'does not call runHooks if top element in stack is not leaf', (done) -> 
 
             hook = PhraseInjector.afterEach OPTS, {}
             OPTS.stack = [
-                {leaf: false}
+                {leaf: false, queue: remaining: 1}
             ]
             RAN = false
             PhraseInjector.runHooks = (hookType, stack, done) -> 
@@ -482,7 +482,7 @@ describe 'PhraseInjector', ->
             ), {}
 
 
-        xit 'calls runHooks if top element is leaf', (done) -> 
+        it 'calls runHooks if top element is leaf', (done) -> 
 
             hook = PhraseInjector.afterEach OPTS, {}
             OPTS.stack = [
@@ -493,7 +493,7 @@ describe 'PhraseInjector', ->
             hook (-> ), {}
 
 
-        xit 'runs hooks in reverse order', (done) -> 
+        it 'runs hooks in reverse order', (done) -> 
 
             hook = PhraseInjector.afterEach OPTS, {}
             OPTS.stack = [
@@ -517,7 +517,7 @@ describe 'PhraseInjector', ->
             hook (->), {}
 
 
-        xit 'pops the stack after running hooks and the stack is not still reversed', (done) -> 
+        it 'pops the stack after running hooks and the stack is not still reversed', (done) -> 
 
             hook = PhraseInjector.afterEach OPTS, {}
             OPTS.stack = [
@@ -525,12 +525,12 @@ describe 'PhraseInjector', ->
                 { depth: 1 }
                 { depth: 2 }
                 { depth: 3 }
-                { depth: 4, leaf: true}
+                { depth: 4, leaf: true, queue: remaining: 1}
             ]
             PhraseInjector.runHooks = (hookType, stack, done) -> 
 
                 stack.should.eql [ 
-                    { depth: 4, leaf: true }
+                    { depth: 4, leaf: true, queue: remaining: 1}
                     { depth: 3 }
                     { depth: 2 }
                     { depth: 1 }
@@ -550,10 +550,10 @@ describe 'PhraseInjector', ->
 
             ), {}
 
-        xit 'runs inline afterEach hooks', (done) -> 
+        it 'runs inline afterEach hooks', (done) -> 
 
 
-            OPTS.stack = [{ depth: 0 }]
+            OPTS.stack = [{ depth: 0, queue: remaining: 1}]
             OPTS.context = leafOnly: false
             RAN  = false
             hook = PhraseInjector.afterEach OPTS, afterEach: (done) -> RAN = true; done()
@@ -565,9 +565,9 @@ describe 'PhraseInjector', ->
             ), {}
 
 
-        xit 'does not run inline hooks if leafOnly mode', (done) -> 
+        it 'does not run inline hooks if leafOnly mode', (done) -> 
 
-            OPTS.stack = [{ depth: 0 }]
+            OPTS.stack   = [queue: remaining: 1]
             OPTS.context = leafOnly: true
             RAN  = false
             hook = PhraseInjector.afterEach OPTS, afterEach: (done) -> RAN = true; done()
@@ -578,10 +578,10 @@ describe 'PhraseInjector', ->
 
             ), {}
 
-        xit 'preserves scope when running inline hooks', (done) -> 
+        it 'preserves scope when running inline hooks', (done) -> 
 
             OPTS.context = {}
-            OPTS.stack   = []
+            OPTS.stack   = [queue: remaining: 1]
 
             obj = new Object
 
@@ -594,10 +594,10 @@ describe 'PhraseInjector', ->
             obj.hook (->), args: []
 
 
-        xit 'resets scope to global if context.global is set', (done) -> 
+        it 'resets scope to global if context.global is set', (done) -> 
 
             OPTS.context = global: true
-            OPTS.stack   = []
+            OPTS.stack   = [queue: remaining: 1]
 
             obj = new Object
 
@@ -662,8 +662,7 @@ describe 'PhraseInjector', ->
 
 
 
-
-    xcontext 'afterAll()', -> 
+    context 'afterAll()', -> 
 
         it 'returns a function that runs the registred afterall hook', (done) -> 
 

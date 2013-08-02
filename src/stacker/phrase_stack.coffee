@@ -90,102 +90,10 @@ module.exports =
 
                 beforeAll:  PhraseInjector.beforeAll  injectionConfig, control
                 beforeEach: PhraseInjector.beforeEach injectionConfig, control
-
+                afterEach:  PhraseInjector.afterEach  injectionConfig, control
                 afterAll:   PhraseInjector.afterAll   injectionConfig, control
 
-                afterEach: (done, inject) -> 
-
-                    element = stack[stack.length - 1]
-
-                    sequence([
-
-                        #
-                        # leafOnly mode, run hooks if leaf
-                        #
-
-                        -> 
-
-                            return unless element.leaf
-                            step = defer()
-
-                            #
-                            # afterEach hooks run in reversed stack order
-                            # 
-
-                            reversed = []
-                            reversed.unshift phrase for phrase in stack
-                            PhraseInjector.runHooks 'afterEach', reversed, (result) ->
-
-                                # 
-                                # TODO: handle error in hook
-                                # 
-                                # return action.reject result if result instanceof Error
-                                # cannot reject because entire sequence must run...
-                                # 
-
-                                step.resolve result
-
-                            step.promise
-
-                        #
-                        # pop the stack
-                        #
-
-                        -> 
-
-                            stack.pop()
-
-                        #
-                        # run non leafOnly hooks
-                        #
-
-                        -> 
-
-                            return if control.leafOnly
-                            #return if element.leaf
-                            return unless typeof control.afterEach == 'function'
-
-                            step = defer()
-                            if control.global
-                                return control.afterEach (result) -> step.resolve result
-                            return control.afterEach.call null, (result) -> step.resolve result
-
-                            step.promise
-
-
-                    ]).then -> 
-
-                        done()
-
-                        #
-                        # resolve parent if necessary 
-                        # 
-
-                        if element.queue.remaining == 0
-
-                            process.nextTick ->
-
-                                #
-                                # no further unprocessed phrases at the current depth
-                                # 
-                                # * resolve the parent (which is not a leaf node and 
-                                #   therefore will receive no resolve call)
-                                #
-
-                                parent = stack[stack.length-1]
-                                if parent?
-
-                                    parent.defer.resolve()
-
-                                else
-
-                                    #
-                                    # no parent, master resolve
-                                    #
-
-                                    context.done() if typeof context.done =='function'
-
-
+                
                 (phrase, nestedControl, fn) -> 
 
                     #
