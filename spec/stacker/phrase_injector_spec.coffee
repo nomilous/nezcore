@@ -466,6 +466,40 @@ describe 'PhraseInjector', ->
             ), {}
 
 
+        it 'calls runHooks if top element is leaf', (done) -> 
+
+            hook = PhraseInjector.afterEach OPTS, {}
+            OPTS.stack = [
+                {leaf: true}
+            ]
+            PhraseInjector.runHooks = -> done()
+
+            hook (-> ), {}
+
+
+        it 'runs hooks in reverse order', (done) -> 
+
+            hook = PhraseInjector.afterEach OPTS, {}
+            OPTS.stack = [
+                { depth: 0 }
+                { depth: 1 }
+                { depth: 2 }
+                { depth: 3 }
+                { depth: 4, leaf: true}
+            ]
+            PhraseInjector.runHooks = (hookType, stack, otherDone) -> 
+
+                stack.should.eql [ 
+                    { depth: 4, leaf: true }
+                    { depth: 3 }
+                    { depth: 2 }
+                    { depth: 1 }
+                    { depth: 0 } 
+                ]
+                done()
+
+            hook (->), {}
+
 
     xcontext 'afterAll()', -> 
 

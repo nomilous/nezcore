@@ -210,7 +210,13 @@ module.exports = injector =
                     return unless element.leaf
                     step = defer()
 
-                    injector.runHooks 'afterEach', opts.stack, (result) ->
+                    #
+                    # afterEach hooks need to be run in reverse stack order
+                    # 
+
+                    reversed = []
+                    reversed.unshift phrase for phrase in opts.stack
+                    injector.runHooks 'afterEach', reversed, (result) ->
 
                         step.resolve result
 
