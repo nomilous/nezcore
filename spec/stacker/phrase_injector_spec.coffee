@@ -501,7 +501,7 @@ describe 'PhraseInjector', ->
             hook (->), {}
 
 
-        it 'pops the stack after running hooks', (done) -> 
+        it 'pops the stack after running hooks and the stack is not still reversed', (done) -> 
 
             hook = PhraseInjector.afterEach OPTS, {}
             OPTS.stack = [
@@ -533,6 +533,37 @@ describe 'PhraseInjector', ->
                 done()
 
             ), {}
+
+        it 'runs inline afterEach hooks', (done) -> 
+
+
+            OPTS.stack = [{ depth: 0 }]
+            OPTS.context = leafOnly: false
+            RAN  = false
+            hook = PhraseInjector.afterEach OPTS, afterEach: (done) -> RAN = true; done()
+            hook (->
+
+                RAN.should.equal true
+                done()
+
+            ), {}
+
+
+        it 'does not run inline hooks if leafOnly mode', (done) -> 
+
+            OPTS.stack = [{ depth: 0 }]
+            OPTS.context = leafOnly: true
+            RAN  = false
+            hook = PhraseInjector.afterEach OPTS, afterEach: (done) -> RAN = true; done()
+            hook (->
+
+                RAN.should.equal false
+                done()
+
+            ), {}
+
+
+
 
 
     xcontext 'afterAll()', -> 

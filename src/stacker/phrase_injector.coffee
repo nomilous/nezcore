@@ -235,7 +235,19 @@ module.exports = injector =
 
                     opts.stack.pop()
 
-                    
+
+                    #
+                ->  # run inline hooks
+                    # 
+                    # * not leafOnly, hooks run around phrase call
+                    #   and are not pended till leaf
+                    #
+                    return if opts.context.leafOnly
+                    return unless typeof control.afterEach == 'function'
+
+                    step = defer()
+                    control.afterEach.call null, (result) -> step.resolve result
+                    step.promise
 
 
             ]).then done, done
