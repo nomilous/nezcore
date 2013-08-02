@@ -199,8 +199,25 @@ module.exports = injector =
 
         return (done, inject) -> 
 
-            done()
+            element = opts.stack[ opts.stack.length - 1 ]
 
+            sequence([
+
+                    #
+                ->  # when leafOnly mode, run hook stack if element is leaf
+                    #
+                    
+                    return unless element.leaf
+                    step = defer()
+
+                    injector.runHooks 'afterEach', opts.stack, (result) ->
+
+                        step.resolve result
+
+                    step.promise
+
+
+            ]).then done, done
 
 
     afterAll: (opts, control) -> 
