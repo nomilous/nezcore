@@ -1,3 +1,6 @@
+sequence         = require 'when/sequence'
+{defer}          = require 'when'
+
 #
 # create before() and after() for hook registration
 #
@@ -28,7 +31,47 @@ module.exports = injector =
         # (for leafOnly mode)
         # 
 
-        done()
+        # 
+        # for loop returns array of functions
+        # each deferring a call to the hook
+        # at that phrase
+        # 
+
+        sequence( for phrase in stack
+
+            do (phrase) -> -> 
+
+                #
+                # do() locks each phrase into a closure
+                # to prevent the for loop having nexted
+                # all deferrals to refer onto the last 
+                # phrase in the stack by the time the 
+                # sequence traversal begins, 
+                # 
+                # but still returns the deferred function 
+                # for the sequence bound function array
+                #
+
+                deferral = defer()
+
+                         # 
+                         # each deferral resolver is passed 
+                         # in on the call to the hook,
+                         # as the done function
+                         # 
+                         # beforeEach:  (done) -> 
+                         # afterEach:   (done) -> 
+                         # 
+
+                phrase[hookType]( deferral.resolve )
+                deferral.promise
+
+        ).then done, done
+
+                #
+                # done is promise resolve and reject handler
+                #
+
 
 
 

@@ -25,6 +25,20 @@ describe 'PhraseInjector', ->
 
             PhraseInjector.runHooks 'beforeEach', [], -> done() 
 
+        it 'calls each hook in the stack', (done) -> 
+
+            RUNS = []    
+            PhraseInjector.runHooks 'beforeEach', [
+
+                { beforeEach: (done) -> RUNS.push 1; done() }
+                { beforeEach: (done) -> RUNS.push 2; done() }
+                { beforeEach: (done) -> RUNS.push 3; done() }
+
+            ], -> 
+
+                RUNS.should.eql [1,2,3]
+                done()
+
 
     xcontext 'beforeAll()', -> 
 
