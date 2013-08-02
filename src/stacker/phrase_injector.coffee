@@ -140,11 +140,16 @@ module.exports = injector =
                             #
 
                             element.leaf = true
-                            injector.runHooks 'beforeEach', opts.stack, done
+                            return injector.runHooks 'beforeEach', opts.stack, done
 
+                        done()
 
-            done()
+            else if typeof control.beforeEach == 'function'
 
+                return control.beforeEach done unless control.global
+                return control.beforeEach.call null, done
+
+            else done()
 
 
 

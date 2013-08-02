@@ -11,6 +11,7 @@ describe 'PhraseInjector', ->
 
         OPTS = 
             stack: []
+            context: {}
 
     xit 'creates before() and after() hook registers', (done) -> 
 
@@ -140,7 +141,7 @@ describe 'PhraseInjector', ->
 
     context 'beforeEach()', -> 
 
-        xit 'returns a function that prepares the async injection', (done) -> 
+        it 'returns a function that prepares the async injection', (done) -> 
 
             control = defer: "parent's async injection promise"
 
@@ -205,7 +206,7 @@ describe 'PhraseInjector', ->
             ), inject
 
 
-        xit 'default arg3 to resolve the parent and pop the stack, if no args', (done) -> 
+        it 'default arg3 to resolve the parent and pop the stack, if no args', (done) -> 
 
             #
             #   phrase 'phrase text', (done) -> 
@@ -250,22 +251,23 @@ describe 'PhraseInjector', ->
             ), inject
 
 
-        xit 'does something useful when called with one arg', (done) -> 
+        it 'does something useful when called with one arg', (done) -> 
 
             inject = args: [ 'phrase text' ]
             hook = PhraseInjector.beforeEach OPTS, {}
             hook done, inject
 
 
-        xit 'pushes the stack', (done) -> 
+        it 'pushes the stack', (done) -> 
 
             OPTS.stack = []
-            OPTS.elementName = 'it'
-            beforeE = ->
+            OPTS.elementName = 'fridge'
+            OPTS.context = {}
+            beforeE = (done) -> done()
             afterE = ->
 
             inject = 
-                args: [ 'does something', -> ]
+                args: [ 'is cold enough', -> ]
                 defer:   'DEFERRAL'
                 queue:   'QUEUE'
                 current: 'CURRENT'
@@ -292,7 +294,7 @@ describe 'PhraseInjector', ->
             ), inject
 
 
-        xit 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
+        it 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
 
             OPTS.stack = []
             OPTS.elementName = 'can'
@@ -336,68 +338,86 @@ describe 'PhraseInjector', ->
             ), inject
 
 
-    it 'calls runHooks if leafMode and a leaf is detected', (done) -> 
+        it 'calls runHooks if leafMode and a leaf is detected', (done) -> 
 
-        OPTS.stack = []
-        OPTS.elementName = 'switches'
-        OPTS.context = leafOnly: true
-        OPTS.context.isLeaf = (params, isLeaf) -> isLeaf true
+            OPTS.stack = []
+            OPTS.elementName = 'switches'
+            OPTS.context = leafOnly: true
+            OPTS.context.isLeaf = (params, isLeaf) -> isLeaf true
 
-        inject = args: [ 
+            inject = args: [ 
 
-                'switch1.cabinet03.container023.local', (done, instance) -> 
+                    'switch1.cabinet03.container023.local', (done, instance) -> 
 
-                    notice instance.status()
-                    done()
-                        
-            ]
+                        notice instance.status()
+                        done()
+                            
+                ]
 
-        hook = PhraseInjector.beforeEach OPTS, {}
+            hook = PhraseInjector.beforeEach OPTS, {}
 
-        PhraseInjector.runHooks = (hookType, stack, resolver) -> 
+            PhraseInjector.runHooks = (hookType, stack, resolver) -> 
 
-            hookType.should.equal 'beforeEach'
-            stack.should.equal OPTS.stack
-            done()
+                hookType.should.equal 'beforeEach'
+                stack.should.equal OPTS.stack
+                done()
 
-        hook (->), inject
+            hook (->), inject
 
 
-    it 'does not call runHooks if leafMode and not a leaf', (done) -> 
+        it 'does not call runHooks if leafMode and not a leaf', (done) -> 
 
-        OPTS.stack = []
-        OPTS.elementName = 'services'
-        OPTS.context = leafOnly: true
-        OPTS.context.isLeaf = (params, isLeaf) -> 
+            OPTS.stack = []
+            OPTS.elementName = 'services'
+            OPTS.context = leafOnly: true
+            OPTS.context.isLeaf = (params, isLeaf) -> 
 
-            #
-            # not a leaf
-            #
+                #
+                # not a leaf
+                #
 
-            isLeaf false
+                isLeaf false
 
-        inject = args: [ 
+            inject = args: [ 
 
-            'switch fabric', (switches, manifest) ->
+                'switch fabric', (switches, manifest) ->
 
-                manifest( /switch\s*\.dc\.local/ ).then (list) ->
+                    manifest( /switch\s*\.dc\.local/ ).then (list) ->
 
-                    for hostname in list 
+                        for hostname in list 
 
-                        switches hostname, (done, switchInstance) -> 
+                            switches hostname, (done, switchInstance) -> 
 
-                            notice.info switchInstance.status()
-                            done()
-                        
-            ]
+                                notice.info switchInstance.status()
+                                done()
+                            
+                ]
 
-        hook = PhraseInjector.beforeEach OPTS, {}
+            hook = PhraseInjector.beforeEach OPTS, {}
 
-        PhraseInjector.runHooks = (hookType, stack, resolver) -> 
+            PhraseInjector.runHooks = (hookType, stack, resolver) -> 
 
-            throw 'SHOULD NOT RUN'
+                throw 'SHOULD NOT RUN'
 
-        hook done, inject
+            hook done, inject
+
+
+        it 'runs the hook if not leaf mode', (done) -> 
+
+            
+            OPTS.elementName = 'it'
+            OPTS.context = {}
+            inject = args: [
+
+                'does something', (done) -> done()
+
+                ]
+            hook = PhraseInjector.beforeEach OPTS, 
+
+                beforeEach: -> done()
+
+            hook (->), inject
+
 
 
 
