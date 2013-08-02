@@ -1,13 +1,13 @@
 {argsOf}         = require('also').util
 {async}          = require('also').inject
-{defer}          = require 'when'
-sequence         = require 'when/sequence'
 PhraseLeafDetect = require './phrase_leaf_detect'
 PhraseInjector   = require './phrase_injector'
 
 #
-# PhraseStack 
+# PhraseStack
 # ===========
+# 
+# 
 # 
 # TODO: ???????????
 # 
@@ -31,44 +31,6 @@ module.exports =
 
 
             injectionFunction = async
-
-                #
-                # TODO
-                # ----
-                # 
-                # * shutdown async timeout (it's additive, cant do 2 seconds per phrase 
-                #   because parent also only gets 2)
-                # 
-                # * implement local timeout as optional (activated if done in signature)
-                # 
-                # * allow per phrase specifying of timeout for nested tree
-                #        
-                # * separate timeout for hooks (same to apply per activation and config)
-                # 
-                # * inject modules / local classes per signature of args [1..] 
-                #   of each phrase function
-                # 
-                # * allow specifying module / class for cases of inline unfriendly names
-                # 
-                #   ie   phrase 'phrase text', (nested, should, MyClass) -> 
-                #        
-                #             should.should.equal  require 'should'
-                #             MyClass.should.equal require '../../{searched}/lib/my_class'
-                # 
-                #                                                                   #
-                #                                                                   # illegal js
-                #                                                                   # 
-                #             nested 'cannot inject names with - and .', (done, some-thing) -> 
-                # 
-                #                 done()
-                # 
-                # * consider using coffee-script feature-thingy-majig (if still in the latest version
-                #                                               and behaves itself)
-                # 
-                #   ie    phrase 'phrase text', (nested, module:ClassName) -> 
-                #  
-                #              c = new ClassName()
-                #  
 
                 parallel: false
                 timeout: control.timeout || 0
@@ -139,3 +101,43 @@ module.exports =
         #
 
         return stacker argsOf( realizerFn )[0], context
+
+
+#
+# TODO
+# ----
+# 
+# * shutdown async timeout (it's additive, cant do 2 seconds per phrase 
+#   because parent also only gets 2)
+# 
+# * implement local timeout as optional (activated if done in signature)
+# 
+# * allow per phrase specifying of timeout for nested tree
+#        
+# * separate timeout for hooks (same to apply per activation and config)
+# 
+# * inject modules / local classes per signature of args [1..] 
+#   of each phrase function
+# 
+# * allow specifying module / class for cases of inline unfriendly names
+# 
+#   ie   phrase 'phrase text', (nested, should, MyClass) -> 
+#        
+#             should.should.equal  require 'should'
+#             MyClass.should.equal require '../../{searched}/lib/my_class'
+# 
+#                                                                   #
+#                                                                   # illegal js
+#                                                                   # 
+#             nested 'cannot inject names with - and .', (done, some-thing) -> 
+# 
+#                 done()
+# 
+# * consider using coffee-script feature-thingy-majig (if still in the latest version
+#                                               and behaves itself)
+# 
+#   ie    phrase 'phrase text', (nested, module:ClassName) -> 
+#  
+#              c = new ClassName()
+#  
+

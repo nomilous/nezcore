@@ -1,1 +1,1 @@
-exports.phraseStack = require './phrase_stack'
+exports.PhraseStack = require './phrase_stack'
