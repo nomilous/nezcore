@@ -19,7 +19,18 @@ Object.defineProperty global, 'after',
         afterHooks.all.push  opts.all  if typeof opts.all  == 'function'
 
 
-module.exports = 
+module.exports = hook = 
+
+    runHooks: (hookType, stack, done) -> 
+
+        #
+        # run all beforeEach and afterEach hooks in the stack
+        # (for leafOnly mode)
+        # 
+
+        done()
+
+
 
     beforeAll: (opts, control) -> 
 
@@ -83,6 +94,8 @@ module.exports =
                     # 
                     # console.log "TODO: something useful at phrase: '#{inject.args[0]}'"
                     # 
+                    # eg. pending specs
+                    # 
 
                     'noop'
                 
@@ -127,6 +140,7 @@ module.exports =
                             #
 
                             element.leaf = true
+                            hook.runHooks 'beforeEach', opts.stack, done
 
 
             done()

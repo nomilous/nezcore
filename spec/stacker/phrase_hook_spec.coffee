@@ -292,7 +292,7 @@ describe 'PhraseHook', ->
             ), inject
 
 
-        it 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
+        xit 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
 
             OPTS.stack = []
             OPTS.elementName = 'can'
@@ -336,6 +336,31 @@ describe 'PhraseHook', ->
             ), inject
 
 
+    it 'calls runHooks if leafMode and a leaf is detected', (done) -> 
+
+        OPTS.stack = []
+        OPTS.elementName = 'switches'
+        OPTS.context = leafOnly: true
+        OPTS.context.isLeaf = (params, isLeaf) -> isLeaf true
+
+        inject = args: [ 
+
+                'switch1.cabinet03.container023.local', (done, instance) -> 
+
+                    notice instance.status()
+                    done()
+                        
+            ]
+
+        hook = PhraseHook.beforeEach OPTS, {}
+
+        PhraseHook.runHooks = (hookType, stack, resolver) -> 
+
+            hookType.should.equal 'beforeEach'
+            stack.should.equal OPTS.stack
+            done()
+
+        hook (->), inject
 
 
 
