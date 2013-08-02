@@ -19,6 +19,12 @@ describe 'PhraseInjector', ->
         after.toString().should.match /afterHooks.each/
         done()
 
+    context 'runHooks()', -> 
+
+        it 'calls the resolver at arg2', (done) -> 
+
+            PhraseInjector.runHooks 'beforeEach', [], -> done() 
+
 
     xcontext 'beforeAll()', -> 
 
@@ -139,7 +145,7 @@ describe 'PhraseInjector', ->
             fn.call obj
 
 
-    context 'beforeEach()', -> 
+    xcontext 'beforeEach()', -> 
 
         it 'returns a function that prepares the async injection', (done) -> 
 
