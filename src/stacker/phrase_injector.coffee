@@ -195,6 +195,13 @@ module.exports = injector =
             else done()
 
 
+    afterEach: (opts, control) -> 
+
+        return (done, inject) -> 
+
+            done()
+
+
 
     afterAll: (opts, control) -> 
 

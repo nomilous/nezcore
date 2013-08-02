@@ -438,7 +438,12 @@ describe 'PhraseInjector', ->
 
             hook (->), inject
 
+    context 'afterEach()', -> 
 
+        it 'returns a function that calls the resolver', (done) -> 
+
+            hook = PhraseInjector.afterEach OPTS, {}
+            hook done, {}
 
 
     context 'afterAll()', -> 
