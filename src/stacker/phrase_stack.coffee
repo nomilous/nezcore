@@ -43,7 +43,7 @@ module.exports =
                 # 
                 # * allow per phrase specifying of timeout for nested tree
                 #        
-                # * separate timeout for (same to apply per activation and config)
+                # * separate timeout for hooks (same to apply per activation and config)
                 # 
                 # * inject modules / local classes per signature of args [1..] 
                 #   of each phrase function
