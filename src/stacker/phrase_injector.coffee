@@ -200,7 +200,7 @@ module.exports = injector =
         return (done, inject) -> 
 
             element = opts.stack[ opts.stack.length - 1 ]
-            object  = if opts.context.global then null else this
+            target  = if opts.context.global then null else this
 
             sequence([
 
@@ -249,14 +249,35 @@ module.exports = injector =
                     step   = defer()
 
                     #
-                    # run hook on global scope if context.global was set
+                    # run hook on specified target scope
                     #
 
-                    control.afterEach.call object, (result) -> step.resolve result
+                    control.afterEach.call target, (result) -> step.resolve result
                     step.promise
 
 
-            ]).then done, done
+            ]).then -> 
+
+                #
+                # resolve this injection step
+                #
+
+                done()
+
+                process.nextTick ->
+
+                    if element? and element.queue.remaining == 0
+
+                        #
+                        # no further phrases queued to run at this stack depth
+                        # ----------------------------------------------------
+                        # 
+                        # * resolve the parent
+                        #
+
+                        parent = opts.stack[ opts.stack.length - 1 ]
+                        return parent.defer.resolve() if parent?
+                    
 
 
     afterAll: (opts, control) -> 

@@ -578,7 +578,7 @@ describe 'PhraseInjector', ->
 
             ), {}
 
-        it 'preserves scope when running inline hooks', (done) -> 
+        xit 'preserves scope when running inline hooks', (done) -> 
 
             OPTS.context = {}
             OPTS.stack   = []
@@ -594,7 +594,7 @@ describe 'PhraseInjector', ->
             obj.hook (->), args: []
 
 
-        it 'resets scope to global if context.global is set', (done) -> 
+        xit 'resets scope to global if context.global is set', (done) -> 
 
             OPTS.context = global: true
             OPTS.stack   = []
@@ -610,6 +610,42 @@ describe 'PhraseInjector', ->
             obj.hook (->), args: []
 
 
+        it 'does not resolve the parent phrase if unprocessed nodes exist on the current phrase', (done) ->
+
+            RAN = false
+            parentPhrase  = defer: resolve: -> RAN = true
+            currentPhrase = queue: remaining: 1
+            OPTS.stack    = [ parentPhrase, currentPhrase ]
+
+            hook = PhraseInjector.afterEach OPTS, {}
+            hook -> 
+
+                #
+                # parent resolver would be on nextTick
+                # (need to test after that)
+                #
+
+                setTimeout (-> 
+                    RAN.should.equal false
+                    done()
+                ), 10
+
+
+        it 'resolves the parent phrase if no unprocessed nodes exist on the current phrase', (done) ->
+
+            RAN = false
+            parentPhrase  = defer: resolve: -> RAN = true
+            currentPhrase = queue: remaining: 0
+            OPTS.stack    = [ parentPhrase, currentPhrase ]
+
+            PhraseInjector.afterEach( OPTS, {} ) -> setTimeout (-> 
+
+                RAN.should.equal true
+                done()
+
+            ), 10
+        
+        
 
 
     xcontext 'afterAll()', -> 
