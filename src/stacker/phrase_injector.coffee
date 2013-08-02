@@ -19,7 +19,7 @@ Object.defineProperty global, 'after',
         afterHooks.all.push  opts.all  if typeof opts.all  == 'function'
 
 
-module.exports = hook = 
+module.exports = injector = 
 
     runHooks: (hookType, stack, done) -> 
 
@@ -140,7 +140,7 @@ module.exports = hook =
                             #
 
                             element.leaf = true
-                            hook.runHooks 'beforeEach', opts.stack, done
+                            injector.runHooks 'beforeEach', opts.stack, done
 
 
             done()

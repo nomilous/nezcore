@@ -1,9 +1,9 @@
 PhraseStack      = require '../../lib/stacker/phrase_stack'
 PhraseLeafDetect = require '../../lib/stacker/phrase_leaf_detect'
-PhraseHook       = require '../../lib/stacker/phrase_hook'
+PhraseInjector   = require '../../lib/stacker/phrase_injector'
 should           = require 'should'
 
-describe 'PhraseHook', -> 
+describe 'PhraseInjector', -> 
 
     OPTS = undefined
 
@@ -23,19 +23,19 @@ describe 'PhraseHook', ->
 
         it 'returns a function', (done) -> 
 
-            PhraseHook.beforeAll().should.be.an.instanceof Function
+            PhraseInjector.beforeAll().should.be.an.instanceof Function
             done()
 
         it 'returns a function that runs the registred beforeall hook', (done) -> 
 
             before all: -> done()
-            hook = PhraseHook.beforeAll OPTS, {}
+            hook = PhraseInjector.beforeAll OPTS, {}
             hook ->
 
 
         it 'running the function calls the resolver', (done) -> 
 
-            hook = PhraseHook.beforeAll OPTS, {}
+            hook = PhraseInjector.beforeAll OPTS, {}
             hook done
 
 
@@ -57,7 +57,7 @@ describe 'PhraseHook', ->
                 each: afterEach
 
             
-            hook = PhraseHook.beforeAll OPTS, control
+            hook = PhraseInjector.beforeAll OPTS, control
             hook ->
             
             control.should.eql
@@ -73,7 +73,7 @@ describe 'PhraseHook', ->
 
             before all: -> throw 'SHOULD NOT RUN'
 
-            hook = PhraseHook.beforeAll OPTS, 
+            hook = PhraseInjector.beforeAll OPTS, 
 
                 #
                 # control alreaty has beforeAll defined
@@ -87,7 +87,7 @@ describe 'PhraseHook', ->
         it 'running the function calls the assigned beforeAll hook', (done) -> 
 
             before all: -> done()
-            hook = PhraseHook.beforeAll OPTS, {}
+            hook = PhraseInjector.beforeAll OPTS, {}
             hook ->
 
 
@@ -100,7 +100,7 @@ describe 'PhraseHook', ->
                 @property.should.equal 'VALUE'
                 done()
 
-            hook = PhraseHook.beforeAll OPTS, {}
+            hook = PhraseInjector.beforeAll OPTS, {}
 
             hook.call obj, ->
 
@@ -117,7 +117,7 @@ describe 'PhraseHook', ->
 
                 @property.should.equal 'VALUE'
 
-                hook = PhraseHook.beforeAll global: true, 
+                hook = PhraseInjector.beforeAll global: true, 
 
                     beforeAll: -> 
 
@@ -144,7 +144,7 @@ describe 'PhraseHook', ->
 
             control = defer: "parent's async injection promise"
 
-            hook = PhraseHook.beforeEach OPTS, control
+            hook = PhraseInjector.beforeEach OPTS, control
 
             #
             # also.inject.async injection context is passed as arg2 to the
@@ -237,7 +237,7 @@ describe 'PhraseHook', ->
 
 
             inject  = args: []
-            hook    = PhraseHook.beforeEach OPTS, control
+            hook    = PhraseInjector.beforeEach OPTS, control
 
             hook (-> 
 
@@ -253,7 +253,7 @@ describe 'PhraseHook', ->
         xit 'does something useful when called with one arg', (done) -> 
 
             inject = args: [ 'phrase text' ]
-            hook = PhraseHook.beforeEach OPTS, {}
+            hook = PhraseInjector.beforeEach OPTS, {}
             hook done, inject
 
 
@@ -270,7 +270,7 @@ describe 'PhraseHook', ->
                 queue:   'QUEUE'
                 current: 'CURRENT'
 
-            hook = PhraseHook.beforeEach OPTS, 
+            hook = PhraseInjector.beforeEach OPTS, 
 
                 beforeEach: beforeE
                 afterEach: afterE
@@ -311,7 +311,7 @@ describe 'PhraseHook', ->
             
             ]
 
-            hook = PhraseHook.beforeEach OPTS, {}
+            hook = PhraseInjector.beforeEach OPTS, {}
 
             OPTS.context.isLeaf = (params, isLeaf) -> 
 
@@ -352,9 +352,9 @@ describe 'PhraseHook', ->
                         
             ]
 
-        hook = PhraseHook.beforeEach OPTS, {}
+        hook = PhraseInjector.beforeEach OPTS, {}
 
-        PhraseHook.runHooks = (hookType, stack, resolver) -> 
+        PhraseInjector.runHooks = (hookType, stack, resolver) -> 
 
             hookType.should.equal 'beforeEach'
             stack.should.equal OPTS.stack
@@ -391,9 +391,9 @@ describe 'PhraseHook', ->
                         
             ]
 
-        hook = PhraseHook.beforeEach OPTS, {}
+        hook = PhraseInjector.beforeEach OPTS, {}
 
-        PhraseHook.runHooks = (hookType, stack, resolver) -> 
+        PhraseInjector.runHooks = (hookType, stack, resolver) -> 
 
             throw 'SHOULD NOT RUN'
 
@@ -405,11 +405,11 @@ describe 'PhraseHook', ->
 
         it 'returns a function that runs the registred afterall hook', (done) -> 
 
-            hook = PhraseHook.afterAll OPTS, afterAll: -> done()
+            hook = PhraseInjector.afterAll OPTS, afterAll: -> done()
             hook -> 
 
         it 'runs the resolver', (done) -> 
 
-            hook = PhraseHook.afterAll OPTS, {}
+            hook = PhraseInjector.afterAll OPTS, {}
             hook done
 

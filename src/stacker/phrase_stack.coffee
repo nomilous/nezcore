@@ -3,7 +3,7 @@
 {defer}          = require 'when'
 sequence         = require 'when/sequence'
 PhraseLeafDetect = require './phrase_leaf_detect'
-PhraseHook       = require './phrase_hook'
+PhraseInjector   = require './phrase_injector'
 
 #
 # PhraseStack 
@@ -97,8 +97,8 @@ module.exports =
                     done()
 
 
-                beforeAll: PhraseHook.beforeAll {}, control
-                afterAll:  PhraseHook.afterAll {}, control
+                beforeAll: PhraseInjector.beforeAll {}, control
+                afterAll:  PhraseInjector.afterAll {}, control
 
                 beforeEach: (done, inject) -> 
 
