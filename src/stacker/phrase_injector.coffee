@@ -189,7 +189,7 @@ module.exports = injector =
 
             else if typeof control.beforeEach == 'function'
 
-                return control.beforeEach done unless control.global
+                return control.beforeEach.call this, done unless control.global
                 return control.beforeEach.call null, done
 
             else done()
@@ -200,13 +200,14 @@ module.exports = injector =
         return (done, inject) -> 
 
             element = opts.stack[ opts.stack.length - 1 ]
+            object  = if opts.context.global then null else this
 
             sequence([
 
                     #
                 ->  # when leafOnly mode, run hook stack if element is leaf
                     #
-                    
+                    return unless element?
                     return unless element.leaf
                     step = defer()
 
@@ -237,16 +238,21 @@ module.exports = injector =
 
 
                     #
-                ->  # run inline hooks
+                ->  # run inline hook
                     # 
                     # * not leafOnly, hooks run around phrase call
                     #   and are not pended till leaf
                     #
+
                     return if opts.context.leafOnly
                     return unless typeof control.afterEach == 'function'
+                    step   = defer()
 
-                    step = defer()
-                    control.afterEach.call null, (result) -> step.resolve result
+                    #
+                    # run hook on global scope if context.global was set
+                    #
+
+                    control.afterEach.call object, (result) -> step.resolve result
                     step.promise
 
 
