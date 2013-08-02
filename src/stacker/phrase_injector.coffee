@@ -218,9 +218,24 @@ module.exports = injector =
                     reversed.unshift phrase for phrase in opts.stack
                     injector.runHooks 'afterEach', reversed, (result) ->
 
+                        # 
+                        # TODO: handle errors in hooks
+                        # 
+                        # return action.reject result if result instanceof Error
+                        # cannot reject because entire sequence must run...
+                        # 
+
                         step.resolve result
 
                     step.promise
+
+                    #
+                ->  # pop the stack
+                    #
+
+                    opts.stack.pop()
+
+                    
 
 
             ]).then done, done

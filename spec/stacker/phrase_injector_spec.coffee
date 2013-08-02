@@ -501,6 +501,40 @@ describe 'PhraseInjector', ->
             hook (->), {}
 
 
+        it 'pops the stack after running hooks', (done) -> 
+
+            hook = PhraseInjector.afterEach OPTS, {}
+            OPTS.stack = [
+                { depth: 0 }
+                { depth: 1 }
+                { depth: 2 }
+                { depth: 3 }
+                { depth: 4, leaf: true}
+            ]
+            PhraseInjector.runHooks = (hookType, stack, done) -> 
+
+                stack.should.eql [ 
+                    { depth: 4, leaf: true }
+                    { depth: 3 }
+                    { depth: 2 }
+                    { depth: 1 }
+                    { depth: 0 } 
+                ]
+                done()
+
+            hook (->
+
+                OPTS.stack.should.eql [ 
+                    { depth: 0 }
+                    { depth: 1 }
+                    { depth: 2 }
+                    { depth: 3 } 
+                ]
+                done()
+
+            ), {}
+
+
     xcontext 'afterAll()', -> 
 
         it 'returns a function that runs the registred afterall hook', (done) -> 
