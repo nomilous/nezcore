@@ -3,6 +3,34 @@ PhraseLeafDetect = require('../../lib/stacker/phrase_leaf_detect')
 should           = require 'should'
 
 
+phrase = PhraseStack.create {}, {}, (emitter) -> 
+
+phrase 'outer phrase text', (nested) -> 
+
+    before each: (done) => 
+        @property = 'A VALUE'
+        console.log '\nBEFORE EACH'
+        done()
+
+    after each: (done) -> 
+        console.log 'AFTER EACH\n'
+        done()
+
+    nested 'inner phrase one', (done) => 
+        console.log @property
+        console.log done.top
+        done()
+
+    nested 'inner phrase two', (done) -> 
+        console.log done.top
+        done()
+
+
+.then -> 
+    
+    console.log 'TOTALLY OVER'
+
+
 
 describe 'PhraseStack', -> 
 

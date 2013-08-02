@@ -24,6 +24,8 @@ Object.defineProperty global, 'after',
 
 module.exports = injector = 
 
+
+
     runHooks: (hookType, stack, done) -> 
 
         #
@@ -73,6 +75,17 @@ module.exports = injector =
                 #
 
 
+    onTimeout:  (opts, control) -> 
+
+        return (done, detail, inject) -> 
+
+            if opts.context.handler?
+
+                if typeof opts.context.handler.onTimeout == 'function'
+            
+                    return opts.context.handler.onTimeout done, detail, pushFn
+
+            done()
 
 
     beforeAll: (opts, control) -> 

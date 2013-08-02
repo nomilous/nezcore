@@ -1,5 +1,4 @@
-{argsOf}         = require('also').util
-{async}          = require('also').inject
+{inject, util}    = require 'also' 
 PhraseLeafDetect = require './phrase_leaf_detect'
 PhraseInjector   = require './phrase_injector'
 
@@ -9,79 +8,65 @@ PhraseInjector   = require './phrase_injector'
 # 
 # 
 # 
-# TODO: ???????????
+#     stacker = PhraseStack.create CONFIG, NOTIFIER, (phrase) -> 
+# 
+# 
+#     phrase 'phrase text', (nested) -> 
+# 
+#         console.log nested.stack
+#     
+#         nested 'nested phrase text', (done) -> 
+# 
+#             console.log done.stack
+#
 # 
 
 module.exports = 
 
-    create: (context, notice, realizerFn) -> 
+    create: (context, notice, rootFn) -> 
 
         stack   = []
 
         context.isLeaf ||= PhraseLeafDetect.default
 
-        stacker = (elementName, control) -> 
+        phraseStacker = (elementName, control) -> 
 
 
-            injectionConfig = 
+
+            injectionContext = 
 
                 elementName: elementName
-                context: context
-                stack: stack
+                context:     context
+                stack:       stack
 
 
-            injectionFunction = async
+            injectionControl = 
 
-                parallel: false
-                timeout: control.timeout || 0
-
-                onError: (error) -> 
-
-                    console.log error.stack
-
-                onTimeout: (done, detail, inject) -> 
-
-                    if context.handler?
-
-                        if typeof context.handler.onTimeout == 'function'
-                    
-                            return context.handler.onTimeout done, detail, pushFn
-
-                    done()
-
-
-                beforeAll:  PhraseInjector.beforeAll  injectionConfig, control
-                beforeEach: PhraseInjector.beforeEach injectionConfig, control
-                afterEach:  PhraseInjector.afterEach  injectionConfig, control
-                afterAll:   PhraseInjector.afterAll   injectionConfig, control
-
-                
-                (phrase, nestedControl, fn) -> 
-
-                    #
-                    # call fn with nested element stacker
-                    #
-
-                    childElementName = argsOf( fn )[0]
-                    # nestedControl.global = control.global
-                    nestedControl.leafOnly = control.leafOnly
-                    fn stacker childElementName, nestedControl
+                parallel:    false
+                timeout:     control.timeout || 0
+                beforeAll:   PhraseInjector.beforeAll  injectionContext, control
+                beforeEach:  PhraseInjector.beforeEach injectionContext, control
+                afterEach:   PhraseInjector.afterEach  injectionContext, control
+                afterAll:    PhraseInjector.afterAll   injectionContext, control
+                onError:     (error) -> console.log error.stack
+                onTimeout:   PhraseInjector.onTimeout  injectionContext, control
 
 
             #
-            # expose stack via property of injectionFunction
-            # ----------------------------------------------
+            # create injection function 
             # 
-            #     stacker = PhraseStack.create CONFIG, NOTIFIER, (element) -> 
-            # 
-            #     element 'phrase text', (nested) -> 
-            # 
-            #         console.log nested.stack
-            #     
-            #         nested 'nested phrase text', (done) -> 
-            # 
-            #             console.log done.stack
-            #
+
+            injectionFunction = inject.async injectionControl, (phrase, nestedControl, fn) -> 
+
+                    #
+                    # recurse phraseStacker into arg1 of fn
+                    #
+
+                    childElementName = util.argsOf( fn )[0]
+                    fn phraseStacker childElementName, nestedControl
+
+
+
 
             Object.defineProperty injectionFunction, 'stack', 
 
@@ -94,13 +79,21 @@ module.exports =
                 enumerable: false
 
 
+
             return injectionFunction
 
-        #
-        # return root element named from arg1 of the realizerFn
-        #
 
-        return stacker argsOf( realizerFn )[0], context
+        #
+        # PhraseStacker.create() returns root injectionFunction 
+        # -----------------------------------------------------
+        # 
+        # * element named from arg1 of the rootFn
+        # * control from the master context
+        # 
+
+        return phraseStacker util.argsOf( rootFn )[0], context
+
+
 
 
 #
