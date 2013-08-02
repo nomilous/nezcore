@@ -20,62 +20,13 @@ module.exports =
 
         context.isLeaf ||= PhraseLeafDetect.default
 
-        runHooks = (hookType, stack, done) -> 
-
-            #
-            # context.leafOnly was set true
-            # -----------------------------
-            # 
-            # In this mode the beforeEach and afterEach hooks are not run inline 
-            # around each phrase boundry, but instead, upon detecting a leaf, the 
-            # entire stack is traversed to run these hook before and after 
-            # the phrase is executed.
-            #
-
-
-                    # 
-                    # for loop returns array of functions
-                    # each deferring a call to the hook
-                    # at that phrase
-                    # 
-
-            sequence( for phrase in stack
-
-                do (phrase) -> -> 
-
-                    #
-                    # do() locks each phrase into a closure
-                    # to prevent the for loop having nexted
-                    # all deferrals to refer onto the last 
-                    # phrase in the stack by the time the 
-                    # sequence traversal begins, 
-                    # 
-                    # but still returns the deferred function 
-                    # for the sequence bound function array
-                    #
-
-                    deferral = defer()
-
-                             # 
-                             # each deferral resolver is passed 
-                             # in on the call to the hook,
-                             # as the done function
-                             # 
-                             # beforeEach:  (done) -> 
-                             # afterEach:   (done) -> 
-                             # 
-
-                    phrase[hookType]( deferral.resolve )
-                    deferral.promise
-
-            ).then done, done
-
-                    #
-                    # done is promise resolve and reject handler
-                    #
-
-
         stacker = (elementName, control) -> 
+
+            injectionOpts = 
+
+                elementName: elementName
+                context: context
+                stack: stack
 
             pushFn = async
 
@@ -97,78 +48,10 @@ module.exports =
                     done()
 
 
-                beforeAll: PhraseInjector.beforeAll {}, control
-                afterAll:  PhraseInjector.afterAll {}, control
-
-                beforeEach: (done, inject) -> 
-
-                    #
-                    # ensure injection of (phrase, control, fn)
-                    #
-
-                    unless typeof inject.args[2] == 'function'
-
-                        inject.args[2] = inject.args[1] || -> 
-
-                            #
-                            # make optional: "auto" resolve
-                            #
-
-                            control.defer.resolve()
-                            stack.pop()
-
-                        inject.args[1] = {}
-
-                    inject.args[1].defer = inject.defer
-
-                    stack.push element = 
-
-                        element:    elementName
-                        phrase:     inject.args[0]
-                        defer:      inject.defer
-                        queue:      inject.queue
-                        current:    inject.current
-                        # fn:         inject.args[2]
-
-                        #
-                        # before and afterEach hooks into the stack
-                        # (default if undefined)
-                        #
-
-                        beforeEach: control.beforeEach || (done) -> done()
-                        afterEach:  control.afterEach  || (done) -> done()
-                        
-
-                    if control.leafOnly 
-
-                        context.isLeaf 
-
-                            element: elementName
-                            phrase: inject.args[0]
-                            fn: inject.args[2]
-
-                            (leaf) ->
-
-                                if leaf
-
-                                    #
-                                    # flag element as leaf so that afterEach does not need
-                                    # to perform the same investigation
-                                    #
-
-                                    element.leaf = true
-                                    return runHooks 'beforeEach', stack, done
-
-                                done()
-
-                    else if typeof control.beforeEach == 'function'
-
-                        return control.beforeEach done unless control.global
-                        return control.beforeEach.call null, done
-
-                    else done()
-
-                    
+                beforeAll:  PhraseInjector.beforeAll  injectionOpts, control
+                beforeEach: PhraseInjector.beforeEach injectionOpts, control
+                
+                afterAll:   PhraseInjector.afterAll   injectionOpts, control
 
                 afterEach: (done, inject) -> 
 
@@ -191,7 +74,7 @@ module.exports =
 
                             reversed = []
                             reversed.unshift phrase for phrase in stack
-                            runHooks 'afterEach', reversed, (result) ->
+                            PhraseInjector.runHooks 'afterEach', reversed, (result) ->
 
                                 # 
                                 # TODO: handle error in hook

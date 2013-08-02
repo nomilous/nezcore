@@ -13,7 +13,7 @@ describe 'PhraseInjector', ->
             stack: []
             context: {}
 
-    xit 'creates before() and after() hook registers', (done) -> 
+    it 'creates before() and after() hook registers', (done) -> 
 
         before.toString().should.match /beforeHooks.each/
         after.toString().should.match /afterHooks.each/
@@ -40,7 +40,7 @@ describe 'PhraseInjector', ->
                 done()
 
 
-    xcontext 'beforeAll()', -> 
+    context 'beforeAll()', -> 
 
         it 'returns a function', (done) -> 
 
@@ -159,7 +159,7 @@ describe 'PhraseInjector', ->
             fn.call obj
 
 
-    xcontext 'beforeEach()', -> 
+    context 'beforeEach()', -> 
 
         it 'returns a function that prepares the async injection', (done) -> 
 
@@ -441,7 +441,7 @@ describe 'PhraseInjector', ->
 
 
 
-    xcontext 'afterAll()', -> 
+    context 'afterAll()', -> 
 
         it 'returns a function that runs the registred afterall hook', (done) -> 
 
