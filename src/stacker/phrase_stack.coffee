@@ -22,13 +22,15 @@ module.exports =
 
         stacker = (elementName, control) -> 
 
-            injectionOpts = 
+
+            injectionConfig = 
 
                 elementName: elementName
                 context: context
                 stack: stack
 
-            pushFn = async
+
+            injectionFunction = async
 
                 parallel: false
                 timeout: control.timeout || 0
@@ -48,10 +50,10 @@ module.exports =
                     done()
 
 
-                beforeAll:  PhraseInjector.beforeAll  injectionOpts, control
-                beforeEach: PhraseInjector.beforeEach injectionOpts, control
-                
-                afterAll:   PhraseInjector.afterAll   injectionOpts, control
+                beforeAll:  PhraseInjector.beforeAll  injectionConfig, control
+                beforeEach: PhraseInjector.beforeEach injectionConfig, control
+
+                afterAll:   PhraseInjector.afterAll   injectionConfig, control
 
                 afterEach: (done, inject) -> 
 
@@ -158,18 +160,33 @@ module.exports =
                     fn stacker childElementName, nestedControl
 
 
-            Object.defineProperty pushFn, 'stack', 
+            #
+            # expose stack via prperty injectionFunction
+            # ------------------------------------------
+            # 
+            #     stacker = PhraseStack.create CONFIG, NOTIFIER, (element) -> 
+            # 
+            #     element 'phrase text', (nested) -> 
+            # 
+            #         console.log nested.stack
+            #     
+            #         nested 'nested phrase text', (done) -> 
+            # 
+            #             console.log done.stack
+            #
+
+            Object.defineProperty injectionFunction, 'stack', 
 
                 get: -> stack
                 enumerable: false
 
-            Object.defineProperty pushFn, 'top', 
+            Object.defineProperty injectionFunction, 'top', 
 
                 get: -> stack[stack.length - 1]
                 enumerable: false
 
 
-            return pushFn
+            return injectionFunction
 
         #
         # return root element named from arg1 of the realizerFn
