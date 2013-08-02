@@ -363,6 +363,43 @@ describe 'PhraseHook', ->
         hook (->), inject
 
 
+    it 'does not call runHooks if leafMode and not a leaf', (done) -> 
+
+        OPTS.stack = []
+        OPTS.elementName = 'services'
+        OPTS.context = leafOnly: true
+        OPTS.context.isLeaf = (params, isLeaf) -> 
+
+            #
+            # not a leaf
+            #
+
+            isLeaf false
+
+        inject = args: [ 
+
+            'switch fabric', (switches, manifest) ->
+
+                manifest( /switch\s*\.dc\.local/ ).then (list) ->
+
+                    for hostname in list 
+
+                        switches hostname, (done, switchInstance) -> 
+
+                            notice.info switchInstance.status()
+                            done()
+                        
+            ]
+
+        hook = PhraseHook.beforeEach OPTS, {}
+
+        PhraseHook.runHooks = (hookType, stack, resolver) -> 
+
+            throw 'SHOULD NOT RUN'
+
+        hook done, inject
+
+
 
     xcontext 'afterAll()', -> 
 
