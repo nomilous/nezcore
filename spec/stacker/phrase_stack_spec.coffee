@@ -2,30 +2,30 @@ PhraseStack      = require '../../lib/stacker/phrase_stack'
 PhraseLeafDetect = require('../../lib/stacker/phrase_leaf_detect')
 should           = require 'should'
 
-phrase = PhraseStack.create {}, {}, (emitter) -> 
+# phrase = PhraseStack.create {}, {}, (emitter) -> 
 
-phrase 'outer phrase text', (nested) -> 
+# phrase 'outer phrase text', (nested) -> 
 
-    before each: (done) => 
-        @property = 'A VALUE'
-        console.log '\nBEFORE EACH'
-        done()
+#     before each: (done) => 
+#         @property = 'A VALUE'
+#         console.log '\nBEFORE EACH'
+#         done()
 
-    after each: (done) -> 
-        console.log 'AFTER EACH\n'
-        done()
+#     after each: (done) -> 
+#         console.log 'AFTER EACH\n'
+#         done()
 
-    nested 'inner phrase one', (done) => 
-        console.log @property
-        #console.log done.top
-        done()
+#     nested 'inner phrase one', (done) => 
+#         console.log @property
+#         #console.log done.top
+#         done()
 
-    nested 'inner phrase two', (done) -> 
+#     nested 'inner phrase two', (done) -> 
         
-        done 'is also phrase injector', (next) -> 
+#         done 'is also phrase injector', (next) -> 
             
-            console.log next.stack
-            next()
+#             console.log next.stack
+#             next()
 
 
 describe 'PhraseStack', -> 
@@ -156,6 +156,87 @@ describe 'PhraseStack', ->
 
                 HOOKS.should.eql ['BEFORE ALL', 'BEFORE EACH', 'AFTER EACH', 'BEFORE EACH', 'AFTER EACH', 'AFTER ALL']
                 done()
+
+
+        it 'waits for afterAll hook', (done) -> 
+
+            RAN = false
+            stacker = PhraseStack.create CONTEXT, NOTICE, REALIZER
+
+            stacker 'outer phrase one', (nest) ->
+                after all: (done) -> setTimeout done, 100
+                nest 'one', (done) -> done()
+
+            stacker 'outer phrase two', (done) -> RAN = true; done()
+
+            setTimeout (-> 
+
+                #
+                # !!!!FAIL!!!!
+                #
+
+                RAN.should.equal false 
+
+            ), 50
+            setTimeout (-> 
+
+                RAN.should.equal true
+                done()
+
+            ), 150
+
+        it 'waits for beforeAll hook', (done) -> 
+
+            RAN = false
+            stacker = PhraseStack.create CONTEXT, NOTICE, REALIZER
+
+            stacker 'outer phrase', (nest) ->
+                before all: (done) -> setTimeout done, 100
+                nest 'one', (done) -> RAN = true; done()
+
+            setTimeout (-> RAN.should.equal false ), 50
+            setTimeout (-> 
+
+                RAN.should.equal true
+                done()
+
+            ), 150
+
+        it 'waits for afterEach hook', (done) ->
+
+            RAN = false
+            stacker = PhraseStack.create CONTEXT, NOTICE, REALIZER
+
+            stacker 'outer phrase', (nest) ->
+                after each: (done) -> setTimeout done, 100
+                nest 'one', (done) -> done()
+                nest 'two', (done) -> RAN = true; done()
+
+            setTimeout (-> RAN.should.equal false ), 50
+            setTimeout (-> 
+
+                RAN.should.equal true
+                done()
+
+            ), 150
+
+
+        it 'waits for beforeEach hook', (done) -> 
+
+            RAN = false
+            stacker = PhraseStack.create CONTEXT, NOTICE, REALIZER
+
+            stacker 'outer phrase', (nest) ->
+                before each: (done) -> setTimeout done, 100
+                nest 'one', (done) -> RAN = true; done()
+
+            setTimeout (-> RAN.should.equal false ), 50
+            setTimeout (-> 
+
+                RAN.should.equal true
+                done()
+
+            ), 150
 
 
         it 'is supports a leafOnly mode that tests for leaf on every phrase', (done) -> 
