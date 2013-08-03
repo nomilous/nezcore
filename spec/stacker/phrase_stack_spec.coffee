@@ -2,7 +2,6 @@ PhraseStack      = require '../../lib/stacker/phrase_stack'
 PhraseLeafDetect = require('../../lib/stacker/phrase_leaf_detect')
 should           = require 'should'
 
-
 phrase = PhraseStack.create {}, {}, (emitter) -> 
 
 phrase 'outer phrase text', (nested) -> 
@@ -18,18 +17,15 @@ phrase 'outer phrase text', (nested) ->
 
     nested 'inner phrase one', (done) => 
         console.log @property
-        console.log done.top
+        #console.log done.top
         done()
 
     nested 'inner phrase two', (done) -> 
-        console.log done.top
-        done()
-
-
-.then -> 
-    
-    console.log 'TOTALLY OVER'
-
+        
+        done 'is also phrase injector', (next) -> 
+            
+            console.log next.stack
+            next()
 
 
 describe 'PhraseStack', -> 

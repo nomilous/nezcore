@@ -6,19 +6,32 @@ PhraseInjector   = require './phrase_injector'
 # PhraseStack
 # ===========
 # 
+# eg.
 # 
-# 
-#     stacker = PhraseStack.create CONFIG, NOTIFIER, (phrase) -> 
-# 
-# 
-#     phrase 'phrase text', (nested) -> 
-# 
-#         console.log nested.stack
+#     phrase = PhraseStack.create {}, {}, (emitter) -> 
 #     
-#         nested 'nested phrase text', (done) -> 
-# 
-#             console.log done.stack
-#
+#     phrase 'outer phrase text', (nested) -> 
+#     
+#         before each: (done) => 
+#             @property = 'A VALUE'
+#             console.log '\nBEFORE EACH'
+#             done()
+#     
+#         after each: (done) -> 
+#             console.log 'AFTER EACH\n'
+#             done()
+#     
+#         nested 'inner phrase one', (done) => 
+#             console.log @property
+#             #console.log done.top
+#             done()
+#     
+#         nested 'inner phrase two', (done) -> 
+#             
+#             done 'is also phrase injector', (next) -> 
+#                 
+#                 console.log next.stack
+#                 next()
 # 
 
 module.exports = 
