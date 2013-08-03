@@ -13,13 +13,13 @@ describe 'PhraseInjector', ->
             stack: []
             context: {}
 
-    it 'creates before() and after() hook registers', (done) -> 
+    xit 'creates before() and after() hook registers', (done) -> 
 
         before.toString().should.match /beforeHooks.each/
         after.toString().should.match /afterHooks.each/
         done()
 
-    context 'runHooks()', -> 
+    xcontext 'runHooks()', -> 
 
         it 'calls the resolver at arg2', (done) -> 
 
@@ -58,6 +58,39 @@ describe 'PhraseInjector', ->
 
             hook = PhraseInjector.beforeAll OPTS, {}
             hook done
+
+        context 'done is optional', ->
+
+            it 'no resolver is injected into the hook if hook arg1 is not "done"', (done) -> 
+
+                hook = PhraseInjector.beforeAll OPTS, beforeAll: -> 
+                    should.not.exist arguments[0]
+                    done()
+
+                hook -> 
+
+            it 'resolver is still called after the doneless hook', (done) -> 
+
+                 hook = PhraseInjector.beforeAll OPTS, beforeAll: -> 
+                 hook -> 
+                    #
+                    # hook still resolves
+                    #
+                    done()
+
+
+            it 'a resolver is injected into the hook if hook arg signature contains "done"', (done) -> 
+
+                before all: (done) -> 
+
+                    should.exist arguments[0]
+                    done.should.be.an.instanceof Function
+                    done()
+
+                hook = PhraseInjector.beforeAll OPTS, {}
+                hook -> 
+
+                    done()
 
 
         it 'running the function attaches registered hooks onto the control', (done) -> 
@@ -138,7 +171,7 @@ describe 'PhraseInjector', ->
 
                 @property.should.equal 'VALUE'
 
-                hook = PhraseInjector.beforeAll global: true, 
+                hook = PhraseInjector.beforeAll context: global: true, 
 
                     beforeAll: -> 
 
@@ -159,7 +192,7 @@ describe 'PhraseInjector', ->
             fn.call obj
 
 
-    context 'beforeEach()', -> 
+    xcontext 'beforeEach()', -> 
 
         it 'returns a function that prepares the async injection', (done) -> 
 
@@ -454,7 +487,7 @@ describe 'PhraseInjector', ->
             obj.hook (->), args: []
 
 
-    context 'afterEach()', -> 
+    xcontext 'afterEach()', -> 
 
         it 'returns a function that calls the resolver', (done) -> 
 
@@ -662,7 +695,7 @@ describe 'PhraseInjector', ->
 
 
 
-    context 'afterAll()', -> 
+    xcontext 'afterAll()', -> 
 
         it 'returns a function that runs the registred afterall hook', (done) -> 
 

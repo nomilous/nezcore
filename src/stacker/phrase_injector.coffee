@@ -1,5 +1,6 @@
 sequence         = require 'when/sequence'
 {defer}          = require 'when'
+{util}           = require 'also'
 
 #
 # create before() and after() for hook registration
@@ -113,8 +114,15 @@ module.exports = injector =
 
             if typeof control.beforeAll == 'function'
 
-                return control.beforeAll.call this, done unless opts.global
-                return control.beforeAll.call null, done
+                if util.argsOf( control.beforeAll )[0] == 'done'
+
+                    return control.beforeAll.call this, done unless opts.context.global
+                    return control.beforeAll.call null, done
+
+                else
+
+                    control.beforeAll.call this unless opts.context.global
+                    control.beforeAll.call null if opts.context.global
 
             done()
 
@@ -202,7 +210,7 @@ module.exports = injector =
 
             else if typeof control.beforeEach == 'function'
 
-                return control.beforeEach.call this, done unless control.global
+                return control.beforeEach.call this, done unless opts.context.global
                 return control.beforeEach.call null, done
 
             else done()
@@ -305,7 +313,7 @@ module.exports = injector =
 
             if typeof control.afterAll == 'function'
 
-                return control.afterAll.call this, done unless control.global
+                return control.afterAll.call this, done unless opts.context.global
                 return control.afterAll.call null, done
 
             done()

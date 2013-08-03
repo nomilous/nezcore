@@ -41,6 +41,7 @@ module.exports =
         stack   = []
 
         context.isLeaf ||= PhraseLeafDetect.default
+        context.global ||= false
 
         phraseStacker = (elementName, control) -> 
 
