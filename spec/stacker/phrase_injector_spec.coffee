@@ -664,25 +664,34 @@ describe 'PhraseInjector', ->
                 ), 10
 
 
-        it 'resolves the parent phrase if no unprocessed nodes (peers) exist on the current phrase', (done) ->
+    context 'afterAll()', -> 
+
+        xit 'returns a function that runs the registred afterall hook', (done) -> 
+
+            hook = PhraseInjector.afterAll OPTS, afterAll: -> done()
+            hook -> 
+
+        xit 'runs the resolver', (done) -> 
+
+            hook = PhraseInjector.afterAll OPTS, afterAll: ->
+            hook -> done()
+
+        xit 'resolves the current phrase', (done) ->
 
             RAN = false
-            parentPhrase  = defer: resolve: -> RAN = true
-            currentPhrase = queue: remaining: 0
-            OPTS.stack    = [ parentPhrase, currentPhrase ]
+            currentPhrase = defer: resolve: -> RAN = true
+            OPTS.stack    = [ currentPhrase ]
 
-            PhraseInjector.afterEach( OPTS, {} ) -> setTimeout (-> 
+            PhraseInjector.afterAll( OPTS, {} ) -> setTimeout (-> 
 
                 RAN.should.equal true
                 done()
 
             ), 10
-        
 
-        it 'resolves the master promise if current phrase is the root and has no further unprocessed peers', (done) -> 
+        it 'resolves the master promise if at the stack root', (done) -> 
 
-            rootPhrase = queue: remaining: 0
-            OPTS.stack = [rootPhrase]
+            OPTS.stack = []
             OPTS.context.done = -> 
 
                 #
@@ -691,23 +700,10 @@ describe 'PhraseInjector', ->
 
                 done()
 
-            PhraseInjector.afterEach( OPTS, {} ) ->
+            PhraseInjector.afterAll( OPTS, {} ) -> 
 
 
-
-    context 'afterAll()', -> 
-
-        it 'returns a function that runs the registred afterall hook', (done) -> 
-
-            hook = PhraseInjector.afterAll OPTS, afterAll: -> done()
-            hook -> 
-
-        it 'runs the resolver', (done) -> 
-
-            hook = PhraseInjector.afterAll OPTS, afterAll: ->
-            hook -> done()
-
-        it 'preserves scope when running inline hooks', (done) -> 
+        xit 'preserves scope when running inline hooks', (done) -> 
 
             OPTS.context = {}
             OPTS.stack   = []

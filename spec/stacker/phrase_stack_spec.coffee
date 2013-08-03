@@ -178,10 +178,6 @@ describe 'PhraseStack', ->
 
             setTimeout (-> 
 
-                #
-                # !!!!FAIL!!!!
-                #
-
                 RAN.should.equal false 
 
             ), 50

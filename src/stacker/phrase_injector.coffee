@@ -285,45 +285,54 @@ module.exports = injector =
 
                 done()
 
-                process.nextTick ->
-
-                    if element? and element.queue.remaining == 0
-
-                        #
-                        # no further phrases (peers) queued to run at this stack depth
-                        # ------------------------------------------------------------
-                        # 
-                        # * resolve the parent
-                        #
-
-                        parent = opts.stack[ opts.stack.length - 1 ]
-                        return parent.defer.resolve() if parent?
-
-                        #
-                        # * this is the root phrase, resolve master promise
-                        #
-
-                        opts.context.done() if typeof opts.context.done =='function'
-                    
-
 
     afterAll: (opts, control) -> 
 
         return (done, inject) -> 
 
+            finished = -> 
+
+                done()
+
+                #
+                # pend resolution of parent till after done()
+                #
+
+                process.nextTick -> 
+
+                    #
+                    # afterAll resolved the parent's injection deferral
+                    # -------------------------------------------------
+                    # 
+                    # * this releases the flow onto the next phrase 
+                    #   at the parent depth
+                    #
+
+                    if opts.stack.length > 0
+
+                        parent = opts.stack[ opts.stack.length - 1 ]
+                        return parent.defer.resolve()
+
+                    #
+                    # * there is no parent, resolve the master deferral if present
+                    #
+                    
+                    opts.context.done() if typeof opts.context.done =='function'
+
+
             if typeof control.afterAll == 'function'
 
                 if util.argsOf( control.afterAll )[0] == 'done'
 
-                    return control.afterAll.call this, done unless opts.context.global
-                    return control.afterAll.call null, done
+                    return control.afterAll.call this, finished unless opts.context.global
+                    return control.afterAll.call null, finished
 
                 else
 
                     control.afterAll.call this unless opts.context.global
                     control.afterAll.call null if opts.context.global
 
-            done()
+            finished()
 
 
 
