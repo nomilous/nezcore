@@ -45,11 +45,37 @@ module.exports = injector =
 
             do (phrase) -> 
 
+                #
+                # do() locks each phrase into a closure
+                # to prevent the for loop having nexted
+                # all deferrals to refer onto the last 
+                # phrase in the stack by the time the 
+                # sequence traversal begins, 
+                # 
+                # but still returns the deferred function 
+                # for the sequence bound function array
+                #
+
                 deferral.optional
+
+                    #
+                    # deferral.optional creates a deferral and
+                    # passes the resolver as done to each hook
+                    # 
+                    # but only if hook's arg signature has done
+                    # at arg1
+                    #
 
                     if: -> util.argsOf( phrase[hookType] )[0] == 'done'
 
-                    phrase[hookType]
+                    #
+                    # optional deferral injects into... 
+                    #
+
+                                        #
+                    phrase[hookType]    # <- this function
+                                        # 
+
 
         ).then done, done
 
