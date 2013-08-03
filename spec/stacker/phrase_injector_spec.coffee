@@ -130,7 +130,7 @@ describe 'PhraseInjector', ->
             hook = PhraseInjector.beforeAll OPTS, 
 
                 #
-                # control alreaty has beforeAll defined
+                # control already has beforeAll defined
                 #
 
                 beforeAll: -> done()
@@ -192,7 +192,21 @@ describe 'PhraseInjector', ->
             fn.call obj
 
 
-    xcontext 'beforeEach()', -> 
+    context 'beforeEach()', -> 
+
+        #
+        # for phrase recursion and flow control
+        # -------------------------------------
+        # 
+        # * PhraseStack controls the flow of the phrase recursion by pending
+        #   the resolution of the parents async injector deferral until
+        #   all it's child phrases are processed
+        # 
+        # * The async injector itself (set parallel: false) controls the flow
+        #   through each child, not processing next until current has completed
+        # 
+        # * Throughout this procedure a phrase stack is pushed and popped
+        #
 
         it 'returns a function that prepares the async injection', (done) -> 
 
@@ -345,6 +359,99 @@ describe 'PhraseInjector', ->
                 done()
 
             ), inject
+
+
+        #
+        # for running if the beforeEach hook itself
+        # -----------------------------------------
+        #
+
+        context 'done is optional (not leafOnly mode)', ->
+
+            it 'no resolver is injected into the hook if hook arg1 is not "done"', (done) -> 
+
+                
+                hook = PhraseInjector.beforeEach OPTS, beforeEach: -> 
+                    
+                    should.not.exist arguments[0]
+                    done()
+
+                hook ( -> ), args: []
+
+            it 'resolver is still called after the doneless hook', (done) -> 
+
+                hook = PhraseInjector.beforeEach OPTS, beforeEach: -> 
+                hook (-> 
+
+                    #
+                    # hook still resolves
+                    #
+                    done()
+
+                ), args: []
+
+
+            it 'a resolver is injected into the hook if hook arg signature contains "done"', (done) -> 
+
+                before each: (resolver) -> 
+
+                    should.exist resolver
+                    resolver.should.be.an.instanceof Function
+                    done()
+
+                hook = PhraseInjector.beforeEach OPTS, {}
+                hook (->), args: []
+
+
+        xcontext 'done is optional (leafOnly mode)', ->
+
+            it 'no resolver is injected into the hook if hook arg1 is not "done"', (done) -> 
+
+                OPTS.stack = []
+                OPTS.elementName = 'it'
+                OPTS.context = leafOnly: true
+                OPTS.context.isLeaf = (params, isLeaf) -> isLeaf true
+                hook = PhraseInjector.beforeEach OPTS, beforeEach: -> 
+                    
+                    should.not.exist arguments[0]
+                    done()
+
+                hook ( -> ), args: []
+
+
+            it 'resolver is still called after the doneless hook', (done) -> 
+
+                OPTS.stack = []
+                OPTS.elementName = 'it'
+                OPTS.context = leafOnly: true
+                OPTS.context.isLeaf = (params, isLeaf) -> isLeaf true
+
+                hook = PhraseInjector.beforeEach OPTS, beforeEach: -> 
+                hook (-> 
+
+                    #
+                    # hook still resolves
+                    #
+                    done()
+
+                ), args: []
+
+
+            it 'a resolver is injected into the hook if hook arg signature contains "done"', (done) -> 
+
+                OPTS.stack = []
+                OPTS.elementName = 'it'
+                OPTS.context = leafOnly: true
+                OPTS.context.isLeaf = (params, isLeaf) -> isLeaf true
+                before each: (resolver) -> 
+
+                    should.exist resolver
+                    resolver.should.be.an.instanceof Function
+                    done()
+
+                hook = PhraseInjector.beforeEach OPTS, {}
+                hook (->), args: []
+
 
 
         it 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
@@ -664,19 +771,19 @@ describe 'PhraseInjector', ->
                 ), 10
 
 
-    context 'afterAll()', -> 
+    xcontext 'afterAll()', -> 
 
-        xit 'returns a function that runs the registred afterall hook', (done) -> 
+        it 'returns a function that runs the registred afterall hook', (done) -> 
 
             hook = PhraseInjector.afterAll OPTS, afterAll: -> done()
             hook -> 
 
-        xit 'runs the resolver', (done) -> 
+        it 'runs the resolver', (done) -> 
 
             hook = PhraseInjector.afterAll OPTS, afterAll: ->
             hook -> done()
 
-        xit 'resolves the current phrase', (done) ->
+        it 'resolves the current phrase', (done) ->
 
             RAN = false
             currentPhrase = defer: resolve: -> RAN = true
@@ -703,7 +810,7 @@ describe 'PhraseInjector', ->
             PhraseInjector.afterAll( OPTS, {} ) -> 
 
 
-        xit 'preserves scope when running inline hooks', (done) -> 
+        it 'preserves scope when running inline hooks', (done) -> 
 
             OPTS.context = {}
             OPTS.stack   = []
