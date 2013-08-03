@@ -167,7 +167,14 @@ describe 'PhraseStack', ->
                 after all: (done) -> setTimeout done, 100
                 nest 'one', (done) -> done()
 
-            stacker 'outer phrase two', (done) -> RAN = true; done()
+            stacker 'outer phrase two', (done) -> 
+
+                #
+                # this should wait for nested afterAll in preceding phrase
+                #
+
+                RAN = true
+                done()
 
             setTimeout (-> 
 
