@@ -19,7 +19,7 @@ describe 'PhraseInjector', ->
         after.toString().should.match /afterHooks.each/
         done()
 
-    xcontext 'runHooks()', -> 
+    context 'runHooks()', -> 
 
         it 'calls the resolver at arg2', (done) -> 
 
@@ -198,17 +198,8 @@ describe 'PhraseInjector', ->
         # for phrase recursion and flow control
         # -------------------------------------
         # 
-        # * PhraseStack controls the flow of the phrase recursion by pending
-        #   the resolution of the parents async injector deferral until
-        #   all it's child phrases are processed
-        # 
-        # * The async injector itself (set parallel: false) controls the flow
-        #   through each child, not processing next until current has completed
-        # 
-        # * Throughout this procedure a phrase stack is pushed and popped
-        #
 
-        it 'returns a function that prepares the async injection', (done) -> 
+        xit 'returns a function that prepares the async injection', (done) -> 
 
             control = defer: "parent's async injection promise"
 
@@ -273,7 +264,7 @@ describe 'PhraseInjector', ->
             ), inject
 
 
-        it 'default arg3 to resolve the parent and pop the stack, if no args', (done) -> 
+        xit 'default arg3 to resolve the parent and pop the stack, if no args', (done) -> 
 
             #
             #   phrase 'phrase text', (done) -> 
@@ -318,14 +309,14 @@ describe 'PhraseInjector', ->
             ), inject
 
 
-        it 'does something useful when called with one arg', (done) -> 
+        xit 'does something useful when called with one arg', (done) -> 
 
             inject = args: [ 'phrase text' ]
             hook = PhraseInjector.beforeEach OPTS, {}
             hook done, inject
 
 
-        it 'pushes the stack', (done) -> 
+        xit 'pushes the stack', (done) -> 
 
             OPTS.stack = []
             OPTS.elementName = 'fridge'
@@ -362,7 +353,7 @@ describe 'PhraseInjector', ->
 
 
         #
-        # for running if the beforeEach hook itself
+        # for running of the beforeEach hook itself
         # -----------------------------------------
         #
 
@@ -391,15 +382,15 @@ describe 'PhraseInjector', ->
                 ), args: []
 
 
-            it 'a resolver is injected into the hook if hook arg signature contains "done"', (done) -> 
+            it 'a resolver is injected into the hook if hook arg signature contains "done"', (good) -> 
 
-                before each: (resolver) -> 
+                OPTS.context.global = false
+                hook = PhraseInjector.beforeEach OPTS, beforeEach: (done) -> 
 
-                    should.exist resolver
-                    resolver.should.be.an.instanceof Function
-                    done()
+                    should.exist done
+                    done.should.be.an.instanceof Function
+                    good()
 
-                hook = PhraseInjector.beforeEach OPTS, {}
                 hook (->), args: []
 
 
@@ -454,7 +445,7 @@ describe 'PhraseInjector', ->
 
 
 
-        it 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
+        xit 'tests for leaf node if leafOnly is enabled and flags element as leaf', (done) -> 
 
             OPTS.stack = []
             OPTS.elementName = 'can'
@@ -498,7 +489,7 @@ describe 'PhraseInjector', ->
             ), inject
 
 
-        it 'calls runHooks if leafMode and a leaf is detected', (done) -> 
+        xit 'calls runHooks if leafMode and a leaf is detected', (done) -> 
 
             OPTS.stack = []
             OPTS.elementName = 'switches'
@@ -525,7 +516,7 @@ describe 'PhraseInjector', ->
             hook (->), inject
 
 
-        it 'does not call runHooks if leafMode and not a leaf', (done) -> 
+        xit 'does not call runHooks if leafMode and not a leaf', (done) -> 
 
             OPTS.stack = []
             OPTS.elementName = 'services'
@@ -562,7 +553,7 @@ describe 'PhraseInjector', ->
             hook done, inject
 
 
-        it 'runs the hook if not leaf mode', (done) -> 
+        xit 'runs the hook if not leaf mode', (done) -> 
 
             
             OPTS.elementName = 'it'
@@ -578,7 +569,7 @@ describe 'PhraseInjector', ->
 
             hook (->), inject
 
-        it 'preserves scope when running inline hooks', (done) -> 
+        xit 'preserves scope when running inline hooks', (done) -> 
 
             OPTS.context = {}
             OPTS.stack   = []

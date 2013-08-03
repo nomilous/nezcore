@@ -132,7 +132,17 @@ module.exports = injector =
         return (done, inject) -> 
 
             #
-            # ensure injection of (phrase, control, fn)
+            # for phrase recursion and flow control
+            # -------------------------------------
+            # 
+            # * PhraseStack controls the flow of the phrase recursion by pending
+            #   the resolution of the parents async injector deferral until
+            #   all it's child phrases are processed
+            # 
+            # * The async injector itself (set parallel: false) controls the flow
+            #   through each child, not processing next until current has completed
+            # 
+            # * Throughout this procedure a phrase stack is pushed and popped
             #
 
             unless typeof inject.args[2] == 'function'
@@ -185,8 +195,17 @@ module.exports = injector =
                 beforeEach: control.beforeEach || (done) -> done()
                 afterEach:  control.afterEach  || (done) -> done()
 
+            #
+            # for running each phrase's beforeEach hook
+            # -----------------------------------------
+            # 
 
             if opts.context.leafOnly
+
+                # 
+                # * in leafOnly mode the hooks are run from the stack upon
+                #   encountering a leaf
+                # 
 
                 opts.context.isLeaf 
 
@@ -210,8 +229,23 @@ module.exports = injector =
 
             else if typeof control.beforeEach == 'function'
 
-                return control.beforeEach.call this, done unless opts.context.global
-                return control.beforeEach.call null, done
+                #
+                # * otherwise the hooks are run inline at each phrase
+                #  
+                # * with or without resolver depending on signature arg1
+                #
+
+                if util.argsOf( control.beforeEach )[0] == 'done'
+
+                    return control.beforeEach.call this, done unless opts.context.global
+                    return control.beforeEach.call null, done
+
+                else
+
+                    control.beforeEach.call this unless opts.context.global
+                    control.beforeEach.call null if opts.context.global
+                    done()
+
 
             else done()
 
