@@ -40,7 +40,7 @@ describe 'PhraseInjector', ->
                 done()
 
 
-    context 'beforeAll()', -> 
+    xcontext 'beforeAll()', -> 
 
         it 'returns a function', (done) -> 
 
@@ -695,7 +695,7 @@ describe 'PhraseInjector', ->
 
 
 
-    xcontext 'afterAll()', -> 
+    context 'afterAll()', -> 
 
         it 'returns a function that runs the registred afterall hook', (done) -> 
 
@@ -704,8 +704,8 @@ describe 'PhraseInjector', ->
 
         it 'runs the resolver', (done) -> 
 
-            hook = PhraseInjector.afterAll OPTS, {}
-            hook done
+            hook = PhraseInjector.afterAll OPTS, afterAll: ->
+            hook -> done()
 
         it 'preserves scope when running inline hooks', (done) -> 
 
@@ -721,4 +721,6 @@ describe 'PhraseInjector', ->
                     done() 
 
             obj.hook (->), args: []
+
+
 

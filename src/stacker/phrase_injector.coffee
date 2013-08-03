@@ -313,9 +313,17 @@ module.exports = injector =
 
             if typeof control.afterAll == 'function'
 
-                return control.afterAll.call this, done unless opts.context.global
-                return control.afterAll.call null, done
+                if util.argsOf( control.afterAll )[0] == 'done'
+
+                    return control.afterAll.call this, done unless opts.context.global
+                    return control.afterAll.call null, done
+
+                else
+
+                    control.afterAll.call this unless opts.context.global
+                    control.afterAll.call null if opts.context.global
 
             done()
+
 
 
