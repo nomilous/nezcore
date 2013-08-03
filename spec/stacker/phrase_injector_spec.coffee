@@ -357,7 +357,7 @@ describe 'PhraseInjector', ->
         # -----------------------------------------
         #
 
-        context 'done is optional (not leafOnly mode)', ->
+        xcontext 'done is optional (not leafOnly mode)', ->
 
             it 'no resolver is injected into the hook if hook arg1 is not "done"', (done) -> 
 
@@ -394,7 +394,7 @@ describe 'PhraseInjector', ->
                 hook (->), args: []
 
 
-        xcontext 'done is optional (leafOnly mode)', ->
+        context 'done is optional (leafOnly mode)', ->
 
             it 'no resolver is injected into the hook if hook arg1 is not "done"', (done) -> 
 
@@ -428,19 +428,19 @@ describe 'PhraseInjector', ->
                 ), args: []
 
 
-            it 'a resolver is injected into the hook if hook arg signature contains "done"', (done) -> 
+            it 'a resolver is injected into the hook if hook arg signature contains "done"', (good) -> 
 
                 OPTS.stack = []
                 OPTS.elementName = 'it'
                 OPTS.context = leafOnly: true
                 OPTS.context.isLeaf = (params, isLeaf) -> isLeaf true
-                before each: (resolver) -> 
+                OPTS.context.global = false
+                hook = PhraseInjector.beforeEach OPTS, beforeEach: (done) -> 
 
-                    should.exist resolver
-                    resolver.should.be.an.instanceof Function
-                    done()
+                    should.exist done
+                    done.should.be.an.instanceof Function
+                    good()
 
-                hook = PhraseInjector.beforeEach OPTS, {}
                 hook (->), args: []
 
 
