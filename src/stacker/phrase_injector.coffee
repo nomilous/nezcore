@@ -60,21 +60,18 @@ module.exports = injector =
 
                     #
                     # deferral.optional creates a deferral and
-                    # passes the resolver as done to each hook
+                    # passes the resolver as done to each hook...
                     # 
-                    # but only if hook's arg signature has done
-                    # at arg1
-                    #
 
-                    if: -> util.argsOf( phrase[hookType] )[0] == 'done'
+                    resolver: 'done'
 
                     #
-                    # optional deferral injects into... 
+                    # ...but only if hook's arg signature 
+                    # contains `done`, otherwise the referral 
+                    # is resolved as soon as the hook returns
                     #
 
-                                        #
-                    phrase[hookType]    # <- this function
-                                        # 
+                    phrase[hookType]
 
 
         ).then done, done
@@ -120,19 +117,23 @@ module.exports = injector =
             control.afterEach  ||= afterEach
             control.afterAll   ||= afterAll
 
-            if typeof control.beforeAll == 'function'
+            return done() unless typeof control.beforeAll == 'function'
 
-                if util.argsOf( control.beforeAll )[0] == 'done'
+            promise = deferral.optional
 
-                    return control.beforeAll.call this, done unless opts.context.global
-                    return control.beforeAll.call null, done
+                resolver: 'done'
+                context: if opts.context.global then null else this
+                control.beforeAll
 
-                else
+            promise().then -> 
 
-                    control.beforeAll.call this unless opts.context.global
-                    control.beforeAll.call null if opts.context.global
+                #
+                # TODO: handle errors in hooks
+                #
 
-            done()
+                done()
+
+        
 
 
     beforeEach: (opts, control) -> 
@@ -235,27 +236,30 @@ module.exports = injector =
 
                         done()
 
-            else if typeof control.beforeEach == 'function'
+                return
 
-                #
+            return done() unless typeof control.beforeEach == 'function'
+
+                #            
                 # * otherwise the hooks are run inline at each phrase
-                #  
-                # * with or without resolver depending on signature arg1
+                # * with or without resolver
+                # * deferral.optional injects resolver if done is present 
+                #   in control.beforeEach function
                 #
 
-                if util.argsOf( control.beforeEach )[0] == 'done'
+            promise = deferral.optional
 
-                    return control.beforeEach.call this, done unless opts.context.global
-                    return control.beforeEach.call null, done
+                resolver: 'done'
+                context: if opts.context.global then null else this
+                control.beforeEach
 
-                else
+            promise().then -> 
 
-                    control.beforeEach.call this unless opts.context.global
-                    control.beforeEach.call null if opts.context.global
-                    done()
+                #
+                # TODO: handle errors in hooks
+                #
 
-
-            else done()
+                done()
 
 
     afterEach: (opts, control) -> 
@@ -309,23 +313,24 @@ module.exports = injector =
 
                     return if opts.context.leafOnly
                     return unless typeof control.afterEach == 'function'
-                    step   = defer()
+                    
+                    promise = deferral.optional
 
-                    #
-                    # run hook on specified target scope
-                    #
+                        resolver: 'done'
+                        context: target
+                        control.afterEach
 
-                    control.afterEach.call target, (result) -> step.resolve result
-                    step.promise
+                    promise()
 
 
             ]).then -> 
 
                 #
-                # resolve this injection step
+                # TODO: handle errors in hooks
                 #
 
                 done()
+
 
 
     afterAll: (opts, control) -> 
@@ -362,19 +367,21 @@ module.exports = injector =
                     opts.context.done() if typeof opts.context.done =='function'
 
 
-            if typeof control.afterAll == 'function'
+            return finished() unless typeof control.afterAll == 'function'
 
-                if util.argsOf( control.afterAll )[0] == 'done'
+            promise = deferral.optional
 
-                    return control.afterAll.call this, finished unless opts.context.global
-                    return control.afterAll.call null, finished
+                resolver: 'done'
+                context: if opts.context.global then null else this
+                control.afterAll
 
-                else
+            promise().then -> 
 
-                    control.afterAll.call this unless opts.context.global
-                    control.afterAll.call null if opts.context.global
+                #
+                # TODO: handle errors in hooks
+                #
 
-            finished()
+                finished()
 
 
 

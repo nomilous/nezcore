@@ -13,7 +13,7 @@ describe 'PhraseInjector', ->
             stack: []
             context: {}
 
-    it 'creates before() and after() hook registers', (done) -> 
+    xit 'creates before() and after() hook registers', (done) -> 
 
         before.toString().should.match /beforeHooks.each/
         after.toString().should.match /afterHooks.each/
@@ -21,7 +21,7 @@ describe 'PhraseInjector', ->
 
     context 'runHooks()', -> 
 
-        it 'calls the resolver at arg2', (done) -> 
+        xit 'calls the resolver at arg2', (done) -> 
 
             PhraseInjector.runHooks 'beforeEach', [], -> done() 
 
