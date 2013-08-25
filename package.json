@@ -11,7 +11,8 @@
     "colors": "~0.6.0-1",
     "coffee-script": "~1.6.3",
     "node-uuid": "~1.4.0",
-    "also": "0.0.5"
+    "also": "0.0.7",
+    "when": "~2.3.0"
   },
   "devDependencies": {
     "nez": "0.0.7",
