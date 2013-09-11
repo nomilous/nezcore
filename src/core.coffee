@@ -1,11 +1,13 @@
 module.exports = core =
     
-    stacker:  require './stacker/stacker'
-    monitor:  require './monitor/monitor'
-    compiler: require './compiler/compiler'
-    parser:   require './parser/parser'
-    spawn:    require './spawn/spawn'
-    checksum: require './checksum/checksum'
+    caller: require './caller/caller'
+
+    # stacker:  require './stacker/stacker'
+    # monitor:  require './monitor/monitor'
+    # compiler: require './compiler/compiler'
+    # parser:   require './parser/parser'
+    # spawn:    require './spawn/spawn'
+    # checksum: require './checksum/checksum'
 
 
     # #
